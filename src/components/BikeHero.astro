@@ -1,0 +1,90 @@
+---
+import Photo from "./Photo.astro";
+import type { Bike } from "../data/catalog";
+import { eur } from "../data/dryad";
+interface Props { bike: Bike }
+const { bike } = Astro.props;
+---
+
+<section class="bh dark" aria-labelledby="bh-h">
+  <div class="wrap bh-top" data-reveal>
+    <h1 id="bh-h">{bike.name}</h1>
+    <p class="lead">{bike.tagline}</p>
+    <dl class="bh-chips">
+      {bike.chips.map(([k, v]) => (<div><dt>{k}</dt><dd>{v}</dd></div>))}
+    </dl>
+    <div class="bh-actions">
+      <a class="btn btn-solid" href="#builds">Shop builds from {eur(bike.from)}</a>
+      <a class="btn btn-line" href="#overview">Overview</a>
+    </div>
+  </div>
+  <div class="wrap">
+    <Photo img={bike.hero} alt={`${bike.name}`} shot={`${bike.name} hero`} ratio="21 / 9" pos={bike.heroPos} eager class="bh-photo" />
+  </div>
+</section>
+
+<style>
+  .bh {
+    padding-block: clamp(56px, 7vw, 96px) 0;
+    background: linear-gradient(var(--ink) 70%, #fff 70%);
+  }
+  .bh-top {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: clamp(40px, 5vw, 64px);
+  }
+  .bh h1 {
+    font-size: clamp(3.5rem, 1rem + 9vw, 9rem);
+    letter-spacing: -0.04em;
+    margin-bottom: 12px;
+  }
+  .bh .lead {
+    color: var(--text-dark-2);
+    margin: 0 auto 32px;
+  }
+  .bh-chips {
+    display: flex;
+    gap: 0;
+    margin: 0 0 36px;
+  }
+  .bh-chips div {
+    padding: 0 28px;
+    border-left: 1px solid var(--line-dark);
+  }
+  .bh-chips div:first-child {
+    border-left: 0;
+  }
+  .bh-chips dt {
+    font-size: 0.75rem;
+    color: var(--text-dark-2);
+    margin-bottom: 4px;
+  }
+  .bh-chips dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  .bh-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  @media (max-width: 860px) {
+    .bh {
+      background: linear-gradient(var(--ink) 78%, #fff 78%);
+    }
+    .bh-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 0;
+    }
+    .bh-chips div:nth-child(3) {
+      border-left: 0;
+    }
+    .bh :global(.bh-photo) {
+      aspect-ratio: 4 / 3 !important;
+    }
+  }
+</style>

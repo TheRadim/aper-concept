@@ -29,3 +29,4 @@ export const photos = {
   riderPortrait: img("2023/11/p1188822.jpg", 1638, 2048),
 };
 export type PhotoKey = keyof typeof photos;
+export const logo = "https://aper-bikes.com/wp-content/uploads/2023/10/logo_fin-1.svg";

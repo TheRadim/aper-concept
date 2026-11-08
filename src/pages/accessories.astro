@@ -1,0 +1,146 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { accessories } from "../data/accessories";
+const eur = (n: number) => "€" + n.toLocaleString("en-GB");
+const filters = ["All", "DRYAD", "KOMPace", "Protection", "Apparel"];
+---
+
+<Layout title="Accessories and spares" description="APER spare parts, protection and apparel. Concept page." page="accessories">
+  <section class="acc-head light">
+    <div class="wrap">
+      <p class="crumb small muted">Home / Accessories</p>
+      <h1>Accessories and spares</h1>
+      <p class="lead">Parts machined or chosen by APER for the DRYAD and KOMPace, sold directly.</p>
+    </div>
+  </section>
+
+  <section class="light acc-shop" aria-label="Products" data-shop>
+    <div class="wrap">
+      <div class="toolbar">
+        <div class="chips" role="group" aria-label="Filter">
+          {filters.map((f, i) => <button class="chip" type="button" data-f={f} aria-pressed={i === 0 ? "true" : "false"}>{f}</button>)}
+        </div>
+        <div class="tool-right">
+          <span class="small muted" data-count>{accessories.length} products</span>
+          <label class="small">Sort
+            <select data-sort>
+              <option value="featured">Featured</option>
+              <option value="low">Price, low to high</option>
+              <option value="high">Price, high to low</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="grid-cards acc-grid" data-grid>
+        {accessories.map((a, i) => (
+          <a class="card" href={a.url} data-fits={a.fits} data-cat={a.cat} data-price={a.price} data-order={i}>
+            <figure class="photo acc-photo"><img src={a.img} alt={a.name} loading="lazy" /></figure>
+            <div class="card-body">
+              <p class="small muted fits">{a.fits === "Apparel" ? "Apparel" : `Fits ${a.fits}`}</p>
+              <h3>{a.name}</h3>
+              <p class="card-price num">{eur(a.price)}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <p class="small muted note">Compatibility inferred from product names on aper-bikes.com.<span class="verify" title="Confirm fitment with APER" /> Buttons open the current APER shop.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .acc-head {
+    padding-block: 40px 32px;
+  }
+  .acc-head h1 {
+    font-size: clamp(2.25rem, 1.5rem + 2.5vw, 3.75rem);
+    margin: 8px 0 12px;
+  }
+  .acc-shop {
+    padding-bottom: var(--section);
+  }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+    margin-bottom: 8px;
+  }
+  .tool-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .tool-right select {
+    margin-left: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    background: #fff;
+  }
+  .acc-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .acc-photo {
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    margin: 12px 12px 0;
+  }
+  .acc-photo img {
+    object-fit: contain;
+  }
+  .fits {
+    margin: 0;
+  }
+  .note {
+    margin-top: 28px;
+  }
+  @media (max-width: 1100px) {
+    .acc-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 860px) {
+    .acc-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .acc-grid h3 {
+      font-size: 0.9375rem;
+    }
+    .card-body {
+      padding: 12px 12px 16px;
+    }
+  }
+</style>
+
+<script>
+  const shop = document.querySelector<HTMLElement>("[data-shop]");
+  if (shop) {
+    const chips = [...shop.querySelectorAll<HTMLButtonElement>("[data-f]")];
+    const grid = shop.querySelector<HTMLElement>("[data-grid]")!;
+    const cards = [...grid.querySelectorAll<HTMLElement>(".card")];
+    const count = shop.querySelector<HTMLElement>("[data-count]")!;
+    const sort = shop.querySelector<HTMLSelectElement>("[data-sort]")!;
+    let f = "All";
+    const apply = () => {
+      let n = 0;
+      cards.forEach((c) => {
+        const fits = c.dataset.fits!, cat = c.dataset.cat!;
+        const show = f === "All" || (f === "Protection" ? cat === "Protection" : f === "Apparel" ? cat === "Apparel" : fits.includes(f));
+        c.hidden = !show;
+        if (show) n++;
+      });
+      count.textContent = `${n} product${n === 1 ? "" : "s"}`;
+      const key = sort.value;
+      [...cards]
+        .sort((a, b) => (key === "low" ? +a.dataset.price! - +b.dataset.price! : key === "high" ? +b.dataset.price! - +a.dataset.price! : +a.dataset.order! - +b.dataset.order!))
+        .forEach((c) => grid.appendChild(c));
+    };
+    chips.forEach((c) => c.addEventListener("click", () => { f = c.dataset.f!; chips.forEach((x) => x.setAttribute("aria-pressed", String(x === c))); apply(); }));
+    sort.addEventListener("change", apply);
+  }
+</script>

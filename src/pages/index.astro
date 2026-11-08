@@ -2,6 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import Photo from "../components/Photo.astro";
 import { builds, eur } from "../data/dryad";
+import { bikes } from "../data/catalog";
+import { accessories } from "../data/accessories";
+const featured = accessories.filter((a) => ["APER Thru Axle", "RD Hanger (UDH)", "Rear Derailleur Pulley Set", "APER Bikes T-Shirt"].includes(a.name));
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const from = builds.find((b) => b.id === "2-11")!.preorder;
 const steps = [
@@ -37,31 +40,25 @@ const service = [
     <div class="wrap">
       <div class="head-row">
         <h2 id="bikes-h">Bikes</h2>
-        <p>Two frames, one method. Both are machined, assembled and supported from the same workshop.</p>
+        <p>Two frames, one method. Machined, assembled and supported from the same workshop in Patras.</p>
       </div>
-      <div class="products">
-        <a class="product" href={`${base}dryad/`}>
-          <Photo img="dryadWorkshop" alt="Gold DRYAD in front of APER's machining centre" shot="DRYAD studio profile, drive side." ratio="4 / 3" pos="50% 70%" />
-          <div class="p-info">
-            <div>
-              <h3>DRYAD</h3>
-              <p class="muted">Gravel and bikepacking</p>
+      <div class="tiles">
+        {bikes.map((bk) => (
+          <article class="tile">
+            <a class="tile-img" href={`${base}${bk.slug}/`} tabindex="-1" aria-hidden="true">
+              <Photo img={bk.card} alt="" shot={`${bk.name} studio profile`} ratio="4 / 5" pos={bk.cardPos} />
+            </a>
+            <div class="tile-text">
+              <h3>{bk.name}</h3>
+              <p class="muted">{bk.tagline}</p>
+              <p class="num tile-price">From {eur(bk.from)}</p>
+              <div class="tile-actions">
+                <a class="btn btn-solid" href={`${base}${bk.slug}/#builds`}>Shop {bk.name}</a>
+                <a class="btn btn-line" href={`${base}${bk.slug}/`}>Explore</a>
+              </div>
             </div>
-            <p class="p-price num">Frameset {eur(builds[0].preorder)}<br /><span class="muted">Complete from {eur(from)}</span></p>
-          </div>
-          <span class="p-tag small">Pre-order · delivery from December 2026</span>
-        </a>
-        <a class="product" href={`${base}kompace/`}>
-          <Photo img="kompaceForest" alt="KOMPace in a pine forest" shot="KOMPace studio profile, drive side." ratio="4 / 3" pos="50% 60%" />
-          <div class="p-info">
-            <div>
-              <h3>KOMPace</h3>
-              <p class="muted">Enduro, 170 / 160 mm, Rising Pivot</p>
-            </div>
-            <p class="p-price num">Frameset €3,969<br /><span class="muted">Complete from €7,769</span></p>
-          </div>
-          <span class="p-tag small">Available</span>
-        </a>
+          </article>
+        ))}
       </div>
     </div>
   </section>
@@ -81,6 +78,26 @@ const service = [
           </li>
         ))}
       </ol>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="acc-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="acc-h">Accessories and spares</h2>
+        <a class="link" href={`${base}accessories/`}>Shop all accessories</a>
+      </div>
+      <div class="grid-cards acc4">
+        {featured.map((a) => (
+          <a class="card" href={a.url}>
+            <figure class="photo acc-photo"><img src={a.img} alt={a.name} loading="lazy" /></figure>
+            <div class="card-body">
+              <h3>{a.name}</h3>
+              <p class="card-price num">€{a.price}</p>
+            </div>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -161,6 +178,52 @@ const service = [
     flex-wrap: wrap;
   }
 
+  .tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+  .tile-img {
+    display: block;
+    overflow: hidden;
+  }
+  .tile-img :global(img) {
+    transition: transform 700ms var(--ease-out);
+  }
+  .tile:hover .tile-img :global(img) {
+    transform: scale(1.03);
+  }
+  .tile-text {
+    padding-top: 20px;
+  }
+  .tile-text h3 {
+    font-size: var(--step-head);
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .tile-text p {
+    margin-bottom: 6px;
+  }
+  .tile-price {
+    font-weight: 600;
+  }
+  .tile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .acc4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .acc-photo {
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    margin: 12px 12px 0;
+  }
+  .acc-photo img {
+    object-fit: contain;
+  }
   .products {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -309,13 +372,60 @@ const service = [
     .hero {
       min-height: 82svh;
     }
+    .tiles,
     .products,
     .about,
     .contact,
     .form {
       grid-template-columns: 1fr;
     }
-    .products {
+    .tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+  .tile-img {
+    display: block;
+    overflow: hidden;
+  }
+  .tile-img :global(img) {
+    transition: transform 700ms var(--ease-out);
+  }
+  .tile:hover .tile-img :global(img) {
+    transform: scale(1.03);
+  }
+  .tile-text {
+    padding-top: 20px;
+  }
+  .tile-text h3 {
+    font-size: var(--step-head);
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .tile-text p {
+    margin-bottom: 6px;
+  }
+  .tile-price {
+    font-weight: 600;
+  }
+  .tile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .acc4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .acc-photo {
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    margin: 12px 12px 0;
+  }
+  .acc-photo img {
+    object-fit: contain;
+  }
+  .products {
       row-gap: 48px;
     }
     .how {

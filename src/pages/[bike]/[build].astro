@@ -1,0 +1,380 @@
+---
+// Product page for one build (pattern: big-brand PDP, gallery + purchase panel, details below).
+import Layout from "../../layouts/Layout.astro";
+import Photo from "../../components/Photo.astro";
+import { bikes, deposit, type Bike, type CatalogBuild } from "../../data/catalog";
+import { geometry, geoRows, eur, facts } from "../../data/dryad";
+import { photos, type PhotoKey } from "../../data/media";
+
+export function getStaticPaths() {
+  return bikes.flatMap((bike) => bike.builds.map((build) => ({ params: { bike: bike.slug, build: build.id }, props: { bike, build } })));
+}
+const { bike, build } = Astro.props as { bike: Bike; build: CatalogBuild };
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const isDryad = bike.slug === "dryad";
+const gallery: [PhotoKey, string][] = isDryad
+  ? [[build.img, build.pos ?? "50% 50%"], ["dryadOnMill", "50% 60%"], ["dryadWorkshop", "50% 30%"], ["ribDetail", "50% 50%"]]
+  : [[build.img, build.pos ?? "50% 50%"], ["kompaceForest", "50% 60%"], ["kompaceDust", "50% 50%"], ["kompaceDrivetrain", "50% 50%"]];
+const others = bike.builds.filter((b) => b.id !== build.id).slice(0, 3);
+---
+
+<Layout title={build.name} description={`${build.name}: ${build.summary} Concept page.`} page={bike.slug}>
+  <section class="pdp light">
+    <div class="wrap pdp-in">
+      <div class="gal" data-gallery>
+        <div class="gal-main">
+          {gallery.map(([k, pos], i) => (
+            <img src={photos[k].src} width={photos[k].width} height={photos[k].height} alt={`${build.name}, image ${i + 1}`} style={`object-position:${pos}`} data-slide={i} hidden={i !== 0} loading={i === 0 ? "eager" : "lazy"} />
+          ))}
+        </div>
+        <div class="gal-thumbs" role="group" aria-label="Choose image">
+          {gallery.map(([k, pos], i) => (
+            <button type="button" data-thumb={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={`Image ${i + 1}`}>
+              <img src={photos[k].src} alt="" style={`object-position:${pos}`} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="crumb small"><a href={base}>Home</a> / <a href={`${base}${bike.slug}/`}>{bike.name}</a> / {build.short}</p>
+        <span class="status small">{build.status}</span>
+        <h1>{build.name}</h1>
+        <p class="pprice num">{eur(build.price)}{build.was && <s>{eur(build.was)}</s>}</p>
+        {build.was && <p class="small muted">Pre-order price, locked with the deposit.</p>}
+        <p class="psum">{build.summary}</p>
+
+        <fieldset class="sizes">
+          <legend><span>Size</span> {isDryad && <a class="link small" href={`${base}dryad/#size`}>What's my size?</a>}</legend>
+          <div class="size-row">
+            {build.sizes.map((s, i) => (
+              <label class="size"><input type="radio" name="size" value={s} checked={i === Math.floor(build.sizes.length / 2)} /><span>{s}</span></label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="colour">
+          <p class="small"><strong>Colour:</strong> {isDryad ? "Gold, as shown" : "Black. Coloured anodising +€300"}{isDryad && <span class="verify" title="Finish options to be confirmed" />}</p>
+        </div>
+
+        {isDryad ? (
+          <>
+            <a class="btn btn-solid buy" href={`${build.shop}?build=${build.id}`}>Reserve with {eur(deposit)} deposit</a>
+            <p class="small muted">{eur(deposit)} today, {eur(build.price - deposit)} when your bike is finished. Delivery from {facts.delivery}.</p>
+          </>
+        ) : (
+          <a class="btn btn-solid buy" href={build.shop}>Buy on aper-bikes.com</a>
+        )}
+
+        <ul class="rules check small usp">
+          <li>Machined and assembled in Patras, Greece</li>
+          <li>5-year frame warranty and crash replacement</li>
+          <li>Built to order, confirmed with you before machining</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section light alt details" aria-label="Product details">
+    <div class="wrap det">
+      <div class="tabs" role="tablist" aria-label="Details">
+        <button role="tab" id="t-spec" aria-controls="p-spec" aria-selected="true">Specifications</button>
+        {isDryad && <button role="tab" id="t-geo" aria-controls="p-geo" aria-selected="false" tabindex="-1">Geometry</button>}
+        <button role="tab" id="t-frame" aria-controls="p-frame" aria-selected="false" tabindex="-1">Frame</button>
+      </div>
+      <div role="tabpanel" id="p-spec" aria-labelledby="t-spec">
+        <dl class="speclist">{(build.specs ?? []).map(([k, v]) => (<div><dt>{k}</dt><dd>{v}</dd></div>))}</dl>
+        {isDryad && <p class="small muted">Full component list in <a class="link" href={`${base}dryad/#compare`}>Compare builds</a>. Specifications may change before production.</p>}
+      </div>
+      {isDryad && (
+        <div role="tabpanel" id="p-geo" aria-labelledby="t-geo" hidden>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Size</th>{geometry.map((g) => <th scope="col">{g.size}</th>)}</tr></thead>
+              <tbody>
+                <tr><th scope="row">Rider height</th>{geometry.map((g) => <td>{g.rider[1] ? `${g.rider[0]}–${g.rider[1]}` : `${g.rider[0]}+`} cm</td>)}</tr>
+                {geoRows.slice(0, 6).map((r) => (<tr><th scope="row">{r.label}</th>{geometry.map((g) => <td>{g[r.key]}{r.unit === "°" ? "°" : ""}</td>)}</tr>))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      <div role="tabpanel" id="p-frame" aria-labelledby="t-frame" hidden>
+        {isDryad ? (
+          <p class="lead">7075-T6 aluminium members, CNC-machined with RibLogic ribs, interlocked, bonded and bolted. One-piece machined fork. Seatstays on replaceable bushings. Six triple-M5 mounting zones. <a class="link" href={`${base}engineering/`}>How it is made</a></p>
+        ) : (
+          <p class="lead">CNC-machined 7075 aluminium frame built around the patented Rising Pivot: the lower shock mount slides on a rail, letting the rear axle move back by up to 45 mm. <a class="link" href={`${base}kompace/#rising-pivot`}>About the Rising Pivot</a></p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="more-h">
+    <div class="wrap">
+      <div class="head-row"><h2 id="more-h">Other {bike.name} builds</h2><a class="link" href={`${base}${bike.slug}/#builds`}>All builds</a></div>
+      <div class="grid-cards">
+        {others.map((b) => (
+          <a class="card" href={`${base}${bike.slug}/${b.id}/`}>
+            <span class="card-badge">{b.status}</span>
+            <Photo img={b.img} alt={b.name} shot={b.name} ratio="4 / 3" pos={b.pos} />
+            <div class="card-body">
+              <h3>{b.name}</h3>
+              <ul>{b.bullets.slice(0, 2).map((x) => <li>{x}</li>)}</ul>
+              <p class="card-price num">{eur(b.price)}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .pdp {
+    padding-block: 24px 64px;
+  }
+  .pdp-in {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+  }
+  .gal-main {
+    background: var(--paper-2);
+    aspect-ratio: 4 / 3;
+  }
+  .gal-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: fade 260ms var(--ease-out);
+  }
+  @keyframes fade {
+    from {
+      opacity: 0.4;
+    }
+  }
+  .gal-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .gal-thumbs button {
+    padding: 0;
+    border: 0;
+    aspect-ratio: 4 / 3;
+    background: var(--paper-2);
+    box-shadow: inset 0 0 0 0 var(--ink);
+    position: relative;
+  }
+  .gal-thumbs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .gal-thumbs button:hover img,
+  .gal-thumbs button[aria-pressed="true"] img {
+    opacity: 1;
+  }
+  .gal-thumbs button[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .panel {
+    position: sticky;
+    top: 96px;
+  }
+  .crumb a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .crumb a:hover {
+    color: var(--ink);
+  }
+  .status {
+    display: inline-block;
+    margin: 16px 0 8px;
+    padding: 3px 8px;
+    background: var(--paper-2);
+    font-weight: 600;
+  }
+  .panel h1 {
+    font-size: clamp(2rem, 1.4rem + 1.6vw, 2.75rem);
+    margin-bottom: 10px;
+  }
+  .pprice {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .pprice s {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .psum {
+    margin: 16px 0 24px;
+  }
+  .sizes {
+    border: 0;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+  .sizes legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .size-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .size {
+    position: relative;
+  }
+  .size input {
+    position: absolute;
+    opacity: 0;
+  }
+  .size span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color var(--t-ui) var(--ease-out);
+  }
+  .size span:hover {
+    border-color: var(--ink);
+  }
+  .size input:checked + span {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .size input:focus-visible + span {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .colour {
+    margin-bottom: 20px;
+  }
+  .buy {
+    width: 100%;
+    min-height: 54px;
+    margin-bottom: 10px;
+  }
+  .usp {
+    margin-top: 28px;
+  }
+  .tabs {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+  .tabs button {
+    background: none;
+    border: 0;
+    padding: 14px 0;
+    font-weight: 600;
+    color: var(--muted);
+    box-shadow: inset 0 -2px 0 transparent;
+    transition: color var(--t-ui) var(--ease-out), box-shadow var(--t-ui) var(--ease-out);
+  }
+  .tabs button[aria-selected="true"] {
+    color: var(--ink);
+    box-shadow: inset 0 -2px 0 var(--ink);
+  }
+  .speclist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    margin: 0 0 16px;
+  }
+  .speclist div {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .speclist dt {
+    color: var(--muted);
+  }
+  .speclist dd {
+    margin: 0;
+    font-weight: 500;
+  }
+  @media (max-width: 860px) {
+    .pdp {
+      padding-top: 0;
+    }
+    .pdp-in {
+      grid-template-columns: 1fr;
+    }
+    .gal {
+      margin-inline: calc(-1 * var(--margin));
+    }
+    .gal-thumbs {
+      padding-inline: var(--margin);
+    }
+    .panel {
+      position: static;
+    }
+    .speclist {
+      grid-template-columns: 1fr;
+    }
+    .speclist div {
+      grid-template-columns: 120px 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Gallery thumbnails.
+  document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((g) => {
+    const slides = [...g.querySelectorAll<HTMLImageElement>("[data-slide]")];
+    const thumbs = [...g.querySelectorAll<HTMLButtonElement>("[data-thumb]")];
+    thumbs.forEach((t, i) =>
+      t.addEventListener("click", () => {
+        slides.forEach((s, j) => (s.hidden = j !== i));
+        thumbs.forEach((x, j) => x.setAttribute("aria-pressed", String(j === i)));
+      }),
+    );
+  });
+  // Tabs with arrow-key support.
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  const select = (t: HTMLButtonElement) => {
+    tabs.forEach((x) => {
+      const on = x === t;
+      x.setAttribute("aria-selected", String(on));
+      x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute("aria-controls")!)!.hidden = !on;
+    });
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(t));
+    t.addEventListener("keydown", (e) => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!d) return;
+      const n = tabs[(i + d + tabs.length) % tabs.length];
+      select(n);
+      n.focus();
+    });
+  });
+</script>

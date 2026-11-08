@@ -1,19 +1,20 @@
 ---
 import "@fontsource-variable/archivo/wdth.css";
 import "../styles/global.css";
+import { logo } from "../data/media";
 interface Props {
   title: string;
   description: string;
-  page: "home" | "dryad" | "engineering" | "kompace" | "support";
+  page: "home" | "dryad" | "engineering" | "kompace" | "support" | "accessories";
 }
 const { title, description, page } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const links: [string, string, Props["page"] | null][] = [
+const links: [string, string, Props["page"] | null, string?][] = [
   ["DRYAD", "dryad/", "dryad"],
   ["KOMPace", "kompace/", "kompace"],
-  ["Engineering", "engineering/", "engineering"],
-  ["About", "#about", null],
-  ["Support", "support/", "support"],
+  ["Accessories", "accessories/", "accessories"],
+  ["Engineering", "engineering/", "engineering", "nav-quiet"],
+  ["About", "#about", null, "nav-quiet"],
 ];
 ---
 
@@ -31,21 +32,30 @@ const links: [string, string, Props["page"] | null][] = [
   </head>
   <body>
     <a class="sr" href="#main">Skip to content</a>
-    <div class="concept"><p>Design concept by Radim Theiner. Not the official APER website.</p></div>
+    <div class="concept">
+      <div class="wrap concept-in">
+        <p>Design concept by Radim Theiner. Not the official APER website.</p>
+        <nav aria-label="Service">
+          <a href={`${base}support/`}>Warranty & support</a>
+          <a href={`${base}dryad/#size`}>Find your size</a>
+          <a href={`${base}#contact`}>Contact</a>
+        </nav>
+      </div>
+    </div>
     <header class="bar" data-bar>
       <div class="wrap bar-in">
-        <a class="mark" href={base} aria-label="APER, home">APER</a>
+        <a class="mark" href={base} aria-label="APER Bikes, home"><img src={logo} alt="APER Bikes" width="50" height="46" /></a>
         <nav class="nav" id="nav" aria-label="Main">
           {
-            links.map(([label, href, key]) => (
-              <a href={base + href} aria-current={key === page ? "page" : undefined}>
+            links.map(([label, href, key, cls]) => (
+              <a class={cls} href={base + href} aria-current={key === page ? "page" : undefined}>
                 {label}
               </a>
             ))
           }
         </nav>
         <div class="bar-end">
-          <a class="btn btn-sm" style="background:#ecedeb;color:#141516" href={`${base}dryad/#buy`}>Reserve</a>
+          <a class="btn btn-sm" style="background:#141516;color:#fff" href={`${base}dryad/#builds`}>Reserve a DRYAD</a>
           <button class="menu-btn" aria-expanded="false" aria-controls="nav" data-menu><span></span><span class="sr">Menu</span></button>
         </div>
       </div>
@@ -57,7 +67,7 @@ const links: [string, string, Props["page"] | null][] = [
       <div class="wrap">
         <div class="foot-top">
           <div>
-            <a class="mark" href={base}>APER</a>
+            <a class="mark foot-logo" href={base}><img src={logo} alt="APER Bikes" width="60" height="56" /></a>
             <p class="small muted">Bicycles designed, programmed, machined and assembled in Patras, Greece.</p>
           </div>
           <div>
@@ -65,7 +75,7 @@ const links: [string, string, Props["page"] | null][] = [
             <ul>
               <li><a href={`${base}dryad/`}>DRYAD</a></li>
               <li><a href={`${base}kompace/`}>KOMPace</a></li>
-              <li><a href="https://aper-bikes.com/shop">Spare parts</a></li>
+              <li><a href={`${base}accessories/`}>Accessories & spares</a></li>
             </ul>
           </div>
           <div>

@@ -1,6 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Photo from "../components/Photo.astro";
+import BikeHero from "../components/BikeHero.astro";
+import SubNav from "../components/SubNav.astro";
+import BuildGrid from "../components/BuildGrid.astro";
+import { bikeBySlug } from "../data/catalog";
+const bike = bikeBySlug("kompace");
 const rows: [string, string][] = [
   ["Use", "Enduro"],
   ["Travel", "170 mm front / 160 mm rear"],
@@ -22,22 +27,23 @@ const colours = [
 ---
 
 <Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension. Concept outline." page="kompace">
-  <section class="section light">
-    <div class="wrap k-grid">
-      <Photo img="kompaceBespoked" alt="KOMPace MY2026 Special Edition at Bespoked" shot="KOMPace studio profile, drive side." ratio="4 / 3" eager credit />
-      <div>
-        <p class="small muted">Bikes / Enduro</p>
-        <h1>KOMPace</h1>
-        <p class="lead">APER's first bike: a 29-inch enduro frame built around the Rising Pivot, the suspension that started the company.</p>
-        <div class="table-wrap">
-          <table><tbody>{rows.map(([a, b]) => <tr><th scope="row">{a}</th><td>{b}</td></tr>)}</tbody></table>
-        </div>
-        <a class="btn btn-solid" href="https://aper-bikes.com/kompace/">Current KOMPace page</a>
+  <BikeHero bike={bike} />
+  <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Builds", "#builds"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Figures", "#figures"]]} />
+
+  <section class="section light" id="overview" aria-labelledby="ov-h">
+    <div class="wrap ov">
+      <div data-reveal>
+        <h2 id="ov-h">The bike that started APER</h2>
+        <p class="lead">A 29-inch enduro frame built around a suspension idea from Nikos's thesis at the University of Patras.</p>
+        <p class="muted">Developed and ridden in the Erymanthos mountains above Patras. Machined from 7075 aluminium, with a flip-chip for two geometry settings.</p>
       </div>
+      <Photo img="kompaceBespoked" alt="KOMPace MY2026 Special Edition at Bespoked" shot="KOMPace studio profile." ratio="4 / 3" credit />
     </div>
   </section>
 
-  <section class="section dark" aria-labelledby="rp-h">
+  <BuildGrid bike={bike} />
+
+  <section class="section dark" id="rising-pivot" aria-labelledby="rp-h">
     <div class="wrap">
       <div class="head-row">
         <h2 id="rp-h">Rising Pivot</h2>
@@ -55,7 +61,7 @@ const colours = [
     </div>
   </section>
 
-  <section class="section light" aria-labelledby="col-h">
+  <section class="section light" id="colours" aria-labelledby="col-h">
     <div class="wrap">
       <div class="head-row">
         <h2 id="col-h">Anodised colours</h2>
@@ -71,9 +77,27 @@ const colours = [
       </ul>
     </div>
   </section>
+  <section class="section light alt" id="figures" aria-labelledby="fig-h">
+    <div class="wrap ov">
+      <h2 id="fig-h">Key figures</h2>
+      <div class="table-wrap">
+        <table><tbody>{rows.map(([a, b]) => <tr><th scope="row">{a}</th><td>{b}</td></tr>)}</tbody></table>
+        <p class="small muted">Figures from aper-bikes.com and BIKE magazine.</p>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <style>
+  .ov {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    gap: clamp(32px, 6vw, 112px);
+    align-items: center;
+  }
+  .ov h2 {
+    margin-bottom: 20px;
+  }
   .k-grid {
     display: grid;
     grid-template-columns: 7fr 5fr;
@@ -117,6 +141,7 @@ const colours = [
     font-weight: 600;
   }
   @media (max-width: 860px) {
+    .ov,
     .k-grid,
     .gallery {
       grid-template-columns: 1fr;
