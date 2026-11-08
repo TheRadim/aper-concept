@@ -26,17 +26,17 @@ const stages = [
   { name: "Finished", text: "Edges and corners finished, ready to join." },
 ];
 const steps = [
-  { h: "Design", p: "Each member is modelled around how it is loaded on a heavy, rough ride, not around a target weight.", shot: "Model on screen beside the matching part on the bench.", verify: true },
-  { h: "Programming", p: "The engineers who design a part also write its toolpaths. A change to a rib goes from model to machine in the same room.", shot: "CAM toolpath simulation on screen.", verify: true },
-  { h: "Machining", p: "Ribs, varying walls and deep undercuts are cut from the profile. Every inside corner keeps the radius of the cutter.", shot: "Spindle mid-cut, coolant and chips." },
-  { h: "Joining", p: "Members meet through machined, interlocking interfaces, then are structurally bonded and mechanically fastened.", shot: "Interlocking joint before bonding." },
-  { h: "Assembly", p: "Frame, one-piece fork and bushing seatstays are assembled and checked in the same workshop, then built to your specification.", shot: "A DRYAD on the assembly stand." },
+  { img: "framePurple", pos: "50% 55%", alt: "Anodised KOMPace frame, studio", h: "Design", p: "Each member is modelled around how it is loaded on a heavy, rough ride, not around a target weight.", shot: "Model on screen beside the matching part on the bench.", verify: true },
+  { img: "dryadWorkshop", pos: "50% 18%", alt: "APER's vertical machining centre", h: "Programming", p: "The engineers who design a part also write its toolpaths. A change to a rib goes from model to machine in the same room.", shot: "CAM toolpath simulation on screen.", verify: true },
+  { img: "dryadOnMill", pos: "50% 60%", alt: "Machined DRYAD frame on the mill table", h: "Machining", p: "Ribs, varying walls and deep undercuts are cut from the profile. Every inside corner keeps the radius of the cutter.", shot: "Spindle mid-cut, coolant and chips." },
+  { img: "frameGold", pos: "50% 55%", alt: "Anodised gold KOMPace frame, studio", h: "Joining", p: "Members meet through machined, interlocking interfaces, then are structurally bonded and mechanically fastened.", shot: "Interlocking joint before bonding." },
+  { img: "dryadWorkshop", pos: "50% 72%", alt: "Assembled DRYAD in the workshop", h: "Assembly", p: "Frame, one-piece fork and bushing seatstays are assembled and checked in the same workshop, then built to your specification.", shot: "A DRYAD on the assembly stand." },
 ];
 ---
 
 <Layout title="Engineering" description="How APER machines bicycle frames from 7075-T6 aluminium in Patras. Concept page." page="engineering">
   <section class="e-hero dark" aria-labelledby="eh-h">
-    <Photo shot="Workshop overview: machining centre, profile stock, a finished frame." ratio="auto" pos="50% 25%" class="e-photo" eager />
+    <Photo img="dryadWorkshop" alt="DRYAD in front of APER's machining centre in Patras" shot="Workshop overview: machining centre, profile stock, a finished frame." ratio="auto" pos="50% 32%" class="e-photo" eager />
     <div class="e-scrim" aria-hidden="true"></div>
     <div class="wrap e-in" data-reveal>
       <h1 id="eh-h">From profile to frame</h1>
@@ -70,7 +70,7 @@ const steps = [
       <div class="head-row"><h2 id="st-h">The process</h2></div>
       {steps.map((s, i) => (
         <article class:list={["estep", i % 2 === 1 && "flip"]} data-reveal>
-          <Photo shot={s.shot} ratio="3 / 2" pos={`50% ${20 + i * 14}%`} />
+          <Photo img={s.img as any} alt={s.alt} shot={s.shot} ratio="3 / 2" pos={s.pos} />
           <div>
             <h3>{s.h}</h3>
             <p class="muted">{s.p}{s.verify && <span class="verify" title="To be confirmed by APER" />}</p>

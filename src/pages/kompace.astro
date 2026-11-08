@@ -12,14 +12,19 @@ const rows: [string, string][] = [
   ["Frameset", "from €3,969"],
   ["Complete bike", "from €7,769"],
   ["MY2026 Special Edition", "€12,969"],
-  ["Coloured anodising", "+€300"],
 ];
+const colours = [
+  { img: "frameGreen", name: "Green" },
+  { img: "frameTeal", name: "Teal" },
+  { img: "frameGold", name: "Gold" },
+  { img: "framePurple", name: "Purple" },
+] as const;
 ---
 
 <Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension. Concept outline." page="kompace">
   <section class="section light">
     <div class="wrap k-grid">
-      <Photo shot="KOMPace studio profile, drive side." ratio="4 / 5" pos="40% 70%" eager />
+      <Photo img="kompaceBespoked" alt="KOMPace MY2026 Special Edition at Bespoked" shot="KOMPace studio profile, drive side." ratio="4 / 3" eager credit />
       <div>
         <p class="small muted">Bikes / Enduro</p>
         <h1>KOMPace</h1>
@@ -27,9 +32,43 @@ const rows: [string, string][] = [
         <div class="table-wrap">
           <table><tbody>{rows.map(([a, b]) => <tr><th scope="row">{a}</th><td>{b}</td></tr>)}</tbody></table>
         </div>
-        <p class="small muted">Outline page. In the full site it uses the same product layout as the DRYAD. Maintenance: lubricate the Rising Pivot rail after every ride or wash.</p>
         <a class="btn btn-solid" href="https://aper-bikes.com/kompace/">Current KOMPace page</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section dark" aria-labelledby="rp-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="rp-h">Rising Pivot</h2>
+        <p>The lower shock mount rides on a carriage that slides along a rail. Over an obstacle the rear axle can move back by up to 45 mm, by APER's figures, so the wheel gets out of the way instead of into it.</p>
+      </div>
+      <div class="gallery">
+        <Photo img="kompaceDust" alt="KOMPace rider drifting through dust on a forest trail" shot="KOMPace on a dusty Erymanthos trail." ratio="3 / 2" class="g-wide" />
+        <Photo img="kompaceDrivetrain" alt="KOMPace drivetrain and idler detail" shot="Rising Pivot carriage and rail, macro." ratio="4 / 5" pos="50% 50%" />
+      </div>
+      <div class="gallery two">
+        <Photo img="kompaceWheelie" alt="KOMPace rider wheelieing at sunset" shot="KOMPace riding at sunset." ratio="3 / 2" />
+        <Photo img="kompaceSlope" alt="KOMPace rider on a steep slope" shot="KOMPace on a steep descent." ratio="3 / 2" />
+      </div>
+      <p class="small muted">Maintenance: lubricate the Rising Pivot rail after every ride or wash.</p>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="col-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="col-h">Anodised colours</h2>
+        <p>Black as standard. Coloured anodising +€300.</p>
+      </div>
+      <ul class="colours">
+        {colours.map((c) => (
+          <li>
+            <Photo img={c.img} alt={`KOMPace frame, ${c.name.toLowerCase()} anodised`} shot={`KOMPace frame, ${c.name}`} ratio="3 / 2" pos="50% 55%" />
+            <p>{c.name}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 </Layout>
@@ -45,11 +84,45 @@ const rows: [string, string][] = [
     margin-bottom: 14px;
   }
   .table-wrap {
-    margin: 24px 0 16px;
+    margin: 24px 0 24px;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .gallery {
+    align-items: stretch;
+  }
+  .gallery :global(.photo) {
+    height: 100%;
+  }
+  .gallery.two {
+    grid-template-columns: 1fr 1fr;
+  }
+  .colours {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .colours :global(.photo) {
+    background: #fff;
+  }
+  .colours p {
+    margin: 10px 0 0;
+    font-weight: 600;
   }
   @media (max-width: 860px) {
-    .k-grid {
+    .k-grid,
+    .gallery {
       grid-template-columns: 1fr;
+    }
+    .colours {
+      grid-template-columns: 1fr 1fr;
     }
   }
 </style>

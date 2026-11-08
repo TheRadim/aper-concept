@@ -1,24 +1,29 @@
 ---
-// Placeholder photo. `shot` is the brief for the real photograph that replaces it (kept in data-shot and alt).
-import { placeholder } from "../data/media";
+// A photo from APER's current site. `shot` describes the photo that should eventually replace it.
+import { photos, type PhotoKey } from "../data/media";
 interface Props {
+  img?: PhotoKey;
   shot: string;
+  alt?: string;
   ratio?: string;
-  pos?: string; // object-position, to crop the single placeholder differently per slot
+  pos?: string;
   class?: string;
   eager?: boolean;
+  credit?: boolean;
 }
-const { shot, ratio = "4 / 3", pos = "50% 72%", class: cls, eager = false } = Astro.props;
+const { img = "dryadWorkshop", shot, alt, ratio = "4 / 3", pos = "50% 50%", class: cls, eager = false, credit = false } = Astro.props;
+const p = photos[img];
 ---
 
 <figure class:list={["photo", cls]} style={`aspect-ratio:${ratio}`} data-shot={shot}>
   <img
-    src={placeholder.src}
-    width={placeholder.width}
-    height={placeholder.height}
-    alt={`Placeholder. Planned photo: ${shot}`}
+    src={p.src}
+    width={p.width}
+    height={p.height}
+    alt={alt ?? shot}
     loading={eager ? "eager" : "lazy"}
     decoding="async"
     style={`object-position:${pos}`}
   />
+  {credit && p.credit && <figcaption class="photo-credit">{p.credit}</figcaption>}
 </figure>

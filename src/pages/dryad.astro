@@ -38,7 +38,7 @@ const rib = (i: number) => {
   <section class="pdp light" id="buy" aria-labelledby="d-h">
     <div class="wrap pdp-in">
       <div class="pdp-media">
-        <Photo shot="DRYAD studio profile, drive side." ratio="4 / 5" pos="50% 70%" eager />
+        <Photo img="dryadWorkshop" alt="Gold DRYAD in front of APER's machining centre" shot="DRYAD studio profile, drive side." ratio="4 / 5" pos="50% 70%" eager />
       </div>
       <div class="pdp-info">
         <p class="small muted crumb"><a class="link" href={base}>Bikes</a> / Gravel</p>
@@ -75,6 +75,9 @@ const rib = (i: number) => {
   </section>
 
   <section class="section dark" aria-labelledby="ov-h">
+    <div class="wrap">
+      <Photo img="dryadOnMill" alt="DRYAD frame on the mill table after machining" shot="DRYAD loaded for bikepacking, three-quarter front, gravel road." ratio="21 / 9" pos="50% 60%" class="ov-photo" />
+    </div>
     <div class="wrap ov">
       <h2 id="ov-h">Made for the road after the road ends</h2>
       <div>
@@ -321,6 +324,9 @@ const rib = (i: number) => {
     margin-top: 32px;
   }
 
+  .dark :global(.ov-photo) {
+    margin-bottom: clamp(48px, 6vw, 96px);
+  }
   .ov {
     display: grid;
     grid-template-columns: 5fr 6fr;
