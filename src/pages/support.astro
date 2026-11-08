@@ -1,0 +1,69 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const items = [
+  { h: "Warranty", p: "Frames and frame components carry a five-year warranty." },
+  { h: "Crash replacement", p: "Damage a frame in a crash within five years of purchase and APER offers a discounted replacement." },
+  { h: "Ordering a DRYAD", p: "A €400 deposit reserves a frame slot and locks the pre-order price. Size and build are confirmed with APER before production; the balance is paid on completion." },
+  { h: "Returns and changes", p: "APER does not offer returns, cancellations or direct exchanges. Each bike is built to order, so ask about sizing and specification before you reserve.", verify: true },
+  { h: "Shipping", p: "Shipping terms by country, costs and typical transit times.", verify: true },
+  { h: "Maintenance", p: "Clean the frame after rides. On the KOMPace, lubricate the Rising Pivot rail after every ride and wash. For adjustments, see a specialist workshop or ask APER." },
+  { h: "Spare parts", p: "Thru axles, derailleur hangers, idlers, pulleys, rail bearings and protection kits are sold directly from APER's shop." },
+];
+---
+
+<Layout title="Support" description="Warranty, crash replacement, ordering and maintenance. Concept page." page="support">
+  <section class="section light">
+    <div class="wrap s-grid">
+      <div>
+        <h1>Support</h1>
+        <p class="lead">Warranty, ordering and service in one place.</p>
+        <a class="btn btn-solid" href={`${base}#contact`}>Contact APER</a>
+      </div>
+      <dl class="s-list">
+        {items.map((i) => (
+          <div>
+            <dt>{i.h}</dt>
+            <dd class="muted">{i.p}{i.verify && <span class="verify" title="To be confirmed by APER" />}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .s-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: clamp(32px, 6vw, 112px);
+    align-items: start;
+  }
+  h1 {
+    margin-bottom: 16px;
+  }
+  .lead {
+    margin-bottom: 28px;
+  }
+  .s-list {
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .s-list > div {
+    border-bottom: 1px solid var(--line);
+    padding: 20px 0;
+  }
+  .s-list dt {
+    font-weight: 600;
+    font-size: var(--step-h3);
+    margin-bottom: 6px;
+  }
+  .s-list dd {
+    margin: 0;
+  }
+  @media (max-width: 860px) {
+    .s-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

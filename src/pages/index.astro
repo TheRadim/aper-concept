@@ -1,0 +1,346 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Photo from "../components/Photo.astro";
+import { builds, eur } from "../data/dryad";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const from = builds.find((b) => b.id === "2-11")!.preorder;
+const steps = [
+  { h: "Profile", p: "Each member starts as a closed-section profile of 7075-T6 aluminium." },
+  { h: "Program", p: "Toolpaths are written in-house, by the engineers who designed the part.", verify: true },
+  { h: "Machine", p: "Ribs, variable walls and undercuts are cut where the load travels. APER calls it RibLogic." },
+  { h: "Fork", p: "The fork is cut from one billet: steerer, crown and blades in a single part." },
+  { h: "Assemble", p: "Members interlock, then are bonded and bolted. Seatstays mount on replaceable bushings." },
+];
+const service = [
+  { h: "5-year frame warranty", p: "On frames and frame components." },
+  { h: "Crash replacement", p: "Discounted replacement frame within five years." },
+  { h: "Spare parts in stock", p: "Axles, hangers, bearings and protection, sold directly." },
+  { h: "Built to order", p: "Your size and build confirmed with you before machining." },
+];
+---
+
+<Layout title="Bicycles machined in Patras" description="APER designs, programs, machines and assembles bicycles in Patras, Greece. Concept site." page="home">
+  <section class="hero dark" aria-labelledby="hero-h">
+    <Photo shot="DRYAD on a gravel road in the Erymanthos foothills, low sun." ratio="auto" pos="50% 74%" class="hero-photo" eager />
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <div class="wrap hero-in" data-reveal>
+      <h1 id="hero-h">Machined in Patras.</h1>
+      <p class="lead">APER builds bicycles. Two mechanical engineers and a small team design, program, machine and assemble every frame in-house.</p>
+      <div class="actions">
+        <a class="btn btn-solid" href={`${base}dryad/`}>Discover the DRYAD</a>
+        <a class="btn btn-line" href={`${base}engineering/`}>How we build</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="bikes-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="bikes-h">Bikes</h2>
+        <p>Two frames, one method. Both are machined, assembled and supported from the same workshop.</p>
+      </div>
+      <div class="products">
+        <a class="product" href={`${base}dryad/`}>
+          <Photo shot="DRYAD studio profile, drive side, neutral background." ratio="4 / 3" pos="50% 74%" />
+          <div class="p-info">
+            <div>
+              <h3>DRYAD</h3>
+              <p class="muted">Gravel and bikepacking</p>
+            </div>
+            <p class="p-price num">Frameset {eur(builds[0].preorder)}<br /><span class="muted">Complete from {eur(from)}</span></p>
+          </div>
+          <span class="p-tag small">Pre-order · delivery from December 2026</span>
+        </a>
+        <a class="product" href={`${base}kompace/`}>
+          <Photo shot="KOMPace studio profile, drive side, neutral background." ratio="4 / 3" pos="30% 70%" />
+          <div class="p-info">
+            <div>
+              <h3>KOMPace</h3>
+              <p class="muted">Enduro, 170 / 160 mm, Rising Pivot</p>
+            </div>
+            <p class="p-price num">Frameset €3,969<br /><span class="muted">Complete from €7,769</span></p>
+          </div>
+          <span class="p-tag small">Available</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" aria-labelledby="how-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="how-h">How a frame is made</h2>
+        <a class="link" href={`${base}engineering/`}>Read the full process</a>
+      </div>
+      <Photo shot="Machining centre cutting a DRYAD down tube, coolant and chips." ratio="21 / 9" pos="50% 20%" class="how-photo" />
+      <ol class="how" data-reveal>
+        {steps.map((s) => (
+          <li>
+            <h3>{s.h}</h3>
+            <p class="muted">{s.p}{s.verify && <span class="verify" title="To be confirmed by APER" />}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="service light alt" aria-label="Warranty and service">
+    <ul class="wrap service-row">
+      {service.map((s) => (
+        <li>
+          <h3>{s.h}</h3>
+          <p class="muted small">{s.p}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section light" id="about" aria-labelledby="about-h">
+    <div class="wrap about">
+      <Photo shot="Nikos and Giorgos at the machining centre, working." ratio="4 / 5" pos="50% 40%" />
+      <div class="about-text" data-reveal>
+        <h2 id="about-h">Two engineers, one workshop</h2>
+        <p class="lead">APER began with Nikos's thesis at the University of Patras: a rear suspension for downhill bikes.</p>
+        <p>Giorgos saw where it could go. The idea became the patented Rising Pivot and APER's first bike, the KOMPace. Christos, Giorgos P. and Kostas have since joined the team.</p>
+        <p><em>Aper</em> is Latin for wild boar, after the Erymanthian Boar of Greek myth. The Erymanthos mountains rise above Patras, and they are where the bikes are ridden and tested.</p>
+        <a class="link" href="#contact">Contact the team</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" id="contact" aria-labelledby="c-h">
+    <div class="wrap contact">
+      <div>
+        <h2 id="c-h">Questions before you order?</h2>
+        <p class="muted">Sizing, builds or delivery to your country. The engineers answer themselves.</p>
+      </div>
+      <form class="form" data-demo-form>
+        <label>Name<input name="name" autocomplete="name" required /></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+        <label class="full">Message<textarea name="q" rows="4"></textarea></label>
+        <div class="full form-end">
+          <button class="btn btn-solid" type="submit">Send message</button>
+          <p class="small muted form-note" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: min(calc(100svh - 96px), 900px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .hero :global(.hero-photo) {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto !important;
+  }
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(10 11 12 / 0.82), rgb(10 11 12 / 0.15) 60%, rgb(10 11 12 / 0));
+  }
+  .hero-in {
+    position: relative;
+    padding-block: 120px clamp(48px, 7vw, 96px);
+  }
+  .hero h1 {
+    margin-bottom: 20px;
+  }
+  .hero .lead {
+    margin-bottom: 32px;
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .products {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+  .product {
+    text-decoration: none;
+    display: block;
+  }
+  .product :global(.photo img) {
+    transition: transform 700ms var(--ease-out);
+  }
+  .product:hover :global(.photo img) {
+    transform: scale(1.025);
+  }
+  .p-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px 0 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .p-info h3 {
+    font-size: var(--step-head);
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+  .p-info p {
+    margin: 0;
+  }
+  .p-price {
+    text-align: right;
+    font-weight: 600;
+  }
+  .p-price .muted {
+    font-weight: 400;
+  }
+  .p-tag {
+    display: block;
+    padding-top: 10px;
+    color: var(--muted);
+  }
+
+  .how {
+    list-style: none;
+    padding: 0;
+    margin: 32px 0 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .how li {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .how h3 {
+    margin-bottom: 8px;
+  }
+  .how p {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .service {
+    padding-block: 40px;
+  }
+  .service-row {
+    list-style: none;
+    padding-left: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-block: 0;
+  }
+  .service-row h3 {
+    font-size: 1.0625rem;
+    margin-bottom: 4px;
+  }
+  .service-row p {
+    margin: 0;
+  }
+
+  .about {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    gap: clamp(32px, 6vw, 112px);
+    align-items: center;
+  }
+  .about h2 {
+    margin-bottom: 24px;
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+  .contact h2 {
+    margin-bottom: 16px;
+  }
+  .form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .form .full {
+    grid-column: 1 / -1;
+  }
+  .form input,
+  .form textarea {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    min-height: 48px;
+    padding: 12px 14px;
+    color: var(--fg);
+    font-size: 1rem;
+    transition: border-color var(--t-ui) var(--ease-out);
+  }
+  .form input:hover,
+  .form textarea:hover {
+    border-color: var(--muted);
+  }
+  .form input:focus,
+  .form textarea:focus {
+    border-color: var(--fg);
+    outline: none;
+  }
+  .form-end {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .form-note {
+    margin: 0;
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      min-height: 82svh;
+    }
+    .products,
+    .about,
+    .contact,
+    .form {
+      grid-template-columns: 1fr;
+    }
+    .products {
+      row-gap: 48px;
+    }
+    .how {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .how li {
+      padding-block: 14px;
+    }
+    .service-row {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 24px;
+    }
+    .form-end {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("[data-demo-form]").forEach((f) => {
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      f.querySelector<HTMLElement>(".form-note")!.textContent = "Concept only. On the live site this goes straight to the team.";
+    });
+  });
+</script>

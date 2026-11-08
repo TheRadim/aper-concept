@@ -1,0 +1,97 @@
+---
+import "@fontsource-variable/archivo/wdth.css";
+import "../styles/global.css";
+interface Props {
+  title: string;
+  description: string;
+  page: "home" | "dryad" | "engineering" | "kompace" | "support";
+}
+const { title, description, page } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const links: [string, string, Props["page"] | null][] = [
+  ["DRYAD", "dryad/", "dryad"],
+  ["KOMPace", "kompace/", "kompace"],
+  ["Engineering", "engineering/", "engineering"],
+  ["About", "#about", null],
+  ["Support", "support/", "support"],
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <title>{title} · APER concept</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#141516" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="sr" href="#main">Skip to content</a>
+    <div class="concept"><p>Design concept by Radim Theiner. Not the official APER website.</p></div>
+    <header class="bar" data-bar>
+      <div class="wrap bar-in">
+        <a class="mark" href={base} aria-label="APER, home">APER</a>
+        <nav class="nav" id="nav" aria-label="Main">
+          {
+            links.map(([label, href, key]) => (
+              <a href={base + href} aria-current={key === page ? "page" : undefined}>
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="bar-end">
+          <a class="btn btn-sm" style="background:#ecedeb;color:#141516" href={`${base}dryad/#buy`}>Reserve</a>
+          <button class="menu-btn" aria-expanded="false" aria-controls="nav" data-menu><span></span><span class="sr">Menu</span></button>
+        </div>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="foot dark">
+      <div class="wrap">
+        <div class="foot-top">
+          <div>
+            <a class="mark" href={base}>APER</a>
+            <p class="small muted">Bicycles designed, programmed, machined and assembled in Patras, Greece.</p>
+          </div>
+          <div>
+            <h2>Bikes</h2>
+            <ul>
+              <li><a href={`${base}dryad/`}>DRYAD</a></li>
+              <li><a href={`${base}kompace/`}>KOMPace</a></li>
+              <li><a href="https://aper-bikes.com/shop">Spare parts</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Company</h2>
+            <ul>
+              <li><a href={`${base}engineering/`}>Engineering</a></li>
+              <li><a href={`${base}#about`}>About</a></li>
+              <li><a href={`${base}#contact`}>Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Help</h2>
+            <ul>
+              <li><a href={`${base}support/`}>Warranty</a></li>
+              <li><a href={`${base}support/`}>Ordering</a></li>
+              <li><a href="https://www.instagram.com/aperbikes/">Instagram</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot-last">
+          <p>Concept by Radim Theiner, Copenhagen, November 2026. Prices and specifications from aper-bikes.com, 8 Nov 2026. Gold dots mark details awaiting confirmation. Placeholder photo © APER Bikes.</p>
+        </div>
+      </div>
+    </footer>
+    <script>
+      import "../scripts/site.ts";
+    </script>
+  </body>
+</html>

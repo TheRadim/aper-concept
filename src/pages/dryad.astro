@@ -1,0 +1,637 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Bike from "../components/Bike.astro";
+import Photo from "../components/Photo.astro";
+import { pocket } from "../lib/bike";
+import { builds, geometry, geoRows, eur, deposit, facts } from "../data/dryad";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const def = builds[1];
+
+const specCols = ["2-11", "1-12", "1-12-di2", "1-13-rival", "1-13-force", "1-13-red"];
+const specs: [string, string[]][] = [
+  ["Shifters", ["GRX ST-RX610", "GRX RX820", "GRX Di2 ST-RX825", "Rival eTap AXS", "Force eTap AXS", "Red eTap AXS"]],
+  ["Crankset", ["GRX FC-RX600", "GRX RX820, 40T", "GRX RX820, 40T", "Rival XPLR, 42T", "Force XPLR carbon, 42T", "Red XPLR carbon, 42T, power"]],
+  ["Cassette", ["11–34T, 11-sp", "10–51T, 12-sp", "10–51T, 12-sp", "10–46T, 13-sp", "10–46T, 13-sp", "10–46T, 13-sp"]],
+  ["Brakes", ["GRX RX400, 180/160", "GRX RX820, 180/160", "GRX RX820, 180/160", "Rival HRD, 160/160", "Force HRD, 160/160", "Red HRD, 160/160"]],
+  ["Wheels", ["Novatec Jefty", "I9 Revive alloy", "I9 Revive 2.0 carbon", "I9 Revive alloy", "I9 Revive alloy", "I9 Revive 2.0 carbon"]],
+  ["Tyres", Array(6).fill("Vittoria Terreno T90 45-622")],
+  ["Bar", ["DEDA Gera alloy 42", "DEDA Gera alloy 42", "DEDA Superzero carbon", "DEDA Gera alloy", "DEDA Gera alloy", "DEDA Superzero carbon"]],
+  ["Seatpost", ["DEDA Zero100 alloy", "DEDA Zero100 alloy", "DEDA carbon", "DEDA Zero100 alloy", "DEDA Zero100 alloy", "DEDA carbon"]],
+  ["Saddle", ["Pro Stealth Offroad", "SQlab 614", "SQlab 614", "SQlab 614", "SQlab 614", "SQlab 614"]],
+];
+const faq = [
+  { q: "How much does it weigh?", a: `${facts.frameWeight} for the frame and ${facts.forkWeight} for the fork, as reported at launch. The DRYAD puts durability and load capacity ahead of the lowest possible weight.`, verify: true },
+  { q: "How wide can the tyres go?", a: "Every build ships on 45 mm Vittoria Terreno T90. Maximum clearance will be published with the final specification.", verify: true },
+  { q: "What do the seatstay bushings do?", a: "They let the seatstays move a small, controlled amount under load, reducing high-frequency vibration while keeping the rear end laterally stiff. They are bolted in and replaceable." },
+  { q: "What does the warranty cover?", a: "Frames and frame components carry a five-year warranty. If you damage a frame in a crash within five years, the Crash Replacement Program offers a discounted replacement." },
+  { q: "Can I return it?", a: "No. Each frame is built to order, so APER does not offer returns or cancellations. Ask any question before you reserve.", verify: true },
+  { q: "Can I ride one first?", a: "Contact APER about demo bikes and dates near you.", verify: true },
+];
+const rib = (i: number) => {
+  const x = -36 + i * 66;
+  const up = i % 2 === 0;
+  return pocket([x, up ? 180 : 80], [x + 120, up ? 180 : 80], [x + 60, up ? 80 : 180], 8);
+};
+---
+
+<Layout title="DRYAD, machined gravel bike" description="The APER DRYAD: gravel and bikepacking bike machined from 7075-T6 aluminium in Patras. Concept page." page="dryad">
+  <section class="pdp light" id="buy" aria-labelledby="d-h">
+    <div class="wrap pdp-in">
+      <div class="pdp-media">
+        <Photo shot="DRYAD studio profile, drive side." ratio="4 / 5" pos="50% 70%" eager />
+      </div>
+      <div class="pdp-info">
+        <p class="small muted crumb"><a class="link" href={base}>Bikes</a> / Gravel</p>
+        <h1 id="d-h">DRYAD</h1>
+        <p class="lead">Gravel and bikepacking bike with a machined 7075-T6 aluminium frame and a one-piece fork.</p>
+        <p class="price num"><span data-price>{eur(def.preorder)}</span> <s class="muted" data-was>{eur(def.standard)}</s></p>
+        <p class="small muted">Pre-order price, locked with the deposit. Delivery from {facts.delivery}.</p>
+
+        <form class="buy" data-buy onsubmit="return false">
+          <fieldset>
+            <legend>Build</legend>
+            {builds.map((b, i) => (
+              <label class="opt">
+                <input type="radio" name="build" value={b.id} checked={i === 1} />
+                <span class="opt-name">{b.name === "Frameset" ? "Frameset" : `DRYAD ${b.name}`}</span>
+                <span class="opt-group muted small">{b.family === "Frameset" ? "Frame, fork, headset, axles" : b.groupset}</span>
+                <span class="opt-price num">{eur(b.preorder)}</span>
+              </label>
+            ))}
+          </fieldset>
+          <p class="small sum" data-sum>{def.groupset}. {def.wheels} wheels.</p>
+          <a class="btn btn-solid buy-btn" data-go href={`https://aper-bikes.com/product/dryad/?build=${def.id}`}>Reserve with {eur(deposit)} deposit</a>
+          <p class="small muted" data-split>{eur(deposit)} deposit today, {eur(def.preorder - deposit)} on completion.</p>
+          <a class="link small" href="#size">Which size am I?</a>
+        </form>
+
+        <ul class="rules check small usp">
+          <li>Designed, machined and assembled in Patras, Greece</li>
+          <li>5-year frame warranty and crash replacement</li>
+          <li>Built to order: size and build confirmed before machining</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" aria-labelledby="ov-h">
+    <div class="wrap ov">
+      <h2 id="ov-h">Made for the road after the road ends</h2>
+      <div>
+        <p class="lead">Forest tracks, broken tarmac, mountain passes. Loaded for a week, or stripped back for a fast day.</p>
+        <p class="muted">The name comes from the Greek <em>drys</em>, oak. The DRYAD puts structural integrity and durability ahead of the lowest possible weight, with six triple-M5 mounting zones for bottles, cargo and bags.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="e-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="e-h">Engineering</h2>
+        <a class="link" href={`${base}engineering/`}>How APER machines a frame</a>
+      </div>
+      <div class="feats">
+        <article>
+          <figure class="fig">
+            <svg viewBox="0 0 600 260" role="img" aria-label="Schematic: a down tube section with alternating triangular rib pockets">
+              <rect x="0" y="70" width="600" height="120" fill="#b9bbb7"></rect>
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => <path d={rib(i)} fill="var(--paper-2)" />)}
+              <rect x="-60" y="60" width="60" height="140" fill="var(--paper-2)"></rect>
+              <rect x="600" y="60" width="60" height="140" fill="var(--paper-2)"></rect>
+              <g class="ann"><path d="M92 70 V30 H200" /><text x="208" y="36">Rib</text><path d="M260 190 V232 H360" /><text x="368" y="238">Pocket</text></g>
+            </svg>
+          </figure>
+          <h3>RibLogic frame</h3>
+          <p class="muted">Each tube starts as a closed aluminium profile. The mill cuts integrated ribs, varies the wall thickness and undercuts deep pockets, leaving material where load travels.</p>
+        </article>
+        <article>
+          <figure class="fig">
+            <svg viewBox="0 0 600 260" role="img" aria-label="Schematic: the one-piece fork, steerer, crown and blades as one part">
+              <path d="M40 130 H230" stroke="#2a2d30" stroke-width="44" />
+              <path d="M230 100 H300 V160 H230 Z" fill="#2a2d30" />
+              <path d="M300 108 L590 122 L590 138 L300 152 Z" fill="#2a2d30" />
+              {[0, 1, 2, 3].map((i) => {
+                const x = 320 + i * 62;
+                const up = i % 2 === 0;
+                return <path d={pocket([x, up ? 144 : 116], [x + 56, up ? 144 : 116], [x + 28, up ? 116 : 144], 4)} fill="var(--paper-2)" />;
+              })}
+              <g class="ann"><path d="M135 106 V60" /><text x="100" y="48">Steerer</text><path d="M265 100 V60" /><text x="236" y="48">Crown</text><path d="M450 150 V210" /><text x="420" y="236">Blades</text></g>
+            </svg>
+          </figure>
+          <h3>One-piece fork</h3>
+          <p class="muted">Steerer, crown and blades are machined from a single billet of 7075-T6. No bonded crown, no weld, no separate blades.</p>
+        </article>
+        <article>
+          <figure class="fig">
+            <svg viewBox="0 0 600 260" role="img" aria-label="Schematic: seatstay meeting the seat tube through a bushing">
+              <rect x="260" y="0" width="60" height="260" fill="#b9bbb7"></rect>
+              <path d="M290 130 L40 250" stroke="#b9bbb7" stroke-width="34" />
+              <circle cx="290" cy="130" r="42" fill="#2a2d30"></circle>
+              <circle cx="290" cy="130" r="22" fill="var(--paper-2)"></circle>
+              <circle cx="290" cy="130" r="8" fill="#2a2d30"></circle>
+              <g class="ann"><path d="M332 130 H420" /><text x="430" y="136">Bushing</text><path d="M130 196 L150 168" /><text x="60" y="230">Seatstay</text></g>
+            </svg>
+          </figure>
+          <h3>Seatstays on bushings</h3>
+          <p class="muted">A small, controlled movement under load takes the sting out of washboard gravel without making the rear end vague. The bushings are bolted in and replaceable.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" id="size" aria-labelledby="sz-h">
+    <div class="wrap sizer" data-sizer data-geo={JSON.stringify(geometry)}>
+      <div class="sz-control">
+        <h2 id="sz-h">Size and geometry</h2>
+        <p class="muted">Set your height. The drawing is generated from the geometry of the matching size.</p>
+        <label class="sz-label" for="height">Your height <output id="h-out" class="num" for="height">176 cm</output></label>
+        <input id="height" type="range" min="150" max="205" value="176" step="1" />
+        <p class="sz-result"><span class="sz-size num" data-size-out>M</span> <span data-size-why class="muted small">171–181 cm fits size M.</span></p>
+      </div>
+      <figure class="sz-fig">
+        <Bike size="M" id="sizer-bike" dims />
+      </figure>
+    </div>
+    <div class="wrap geo-wrap" id="geometry">
+      <div class="table-wrap">
+        <table class="geo" data-geo-table>
+          <caption class="sr">DRYAD geometry by size, millimetres and degrees</caption>
+          <thead>
+            <tr><th scope="col">Size</th>{geometry.map((g) => <th scope="col" data-col={g.size}>{g.size}</th>)}</tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Rider height</th>{geometry.map((g) => <td data-col={g.size}>{g.rider[1] ? `${g.rider[0]}–${g.rider[1]}` : `${g.rider[0]}+`} cm</td>)}</tr>
+            {geoRows.map((r) => (
+              <tr>
+                <th scope="row">{r.label}</th>
+                {geometry.map((g) => <td data-col={g.size}>{g[r.key]}{r.unit === "°" ? "°" : ""}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="sp-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="sp-h">Specifications</h2>
+        <p>All builds share the frameset: frame, one-piece fork, headset, seat clamp, UDH hanger and APER 12 mm thru axles. Frame weight {facts.frameWeight.toLowerCase()}.<span class="verify" title="Press figure, to be confirmed" /></p>
+      </div>
+      <div class="table-wrap">
+        <table class="specs">
+          <caption class="sr">Components by build</caption>
+          <thead>
+            <tr><th scope="col">Component</th>{specCols.map((id) => <th scope="col">{builds.find((b) => b.id === id)!.name}</th>)}</tr>
+          </thead>
+          <tbody>
+            {specs.map(([k, v]) => (<tr><th scope="row">{k}</th>{v.map((c) => <td>{c}</td>)}</tr>))}
+            <tr><th scope="row">Pre-order</th>{specCols.map((id) => <td class="num"><strong>{eur(builds.find((b) => b.id === id)!.preorder)}</strong></td>)}</tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Specifications may change before production.</p>
+    </div>
+  </section>
+
+  <section class="section light alt" aria-labelledby="o-h">
+    <div class="wrap">
+      <div class="head-row"><h2 id="o-h">How ordering works</h2></div>
+      <ol class="order">
+        <li><h3>Reserve</h3><p class="muted">A {eur(deposit)} deposit secures a frame slot and locks the pre-order price. It comes off the final price.</p></li>
+        <li><h3>Confirm</h3><p class="muted">APER confirms your size and build with you before machining starts.</p></li>
+        <li><h3>Receive</h3><p class="muted">Pay the balance when your bike is finished. First deliveries from {facts.delivery}.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="q-h">
+    <div class="wrap faq-grid">
+      <div>
+        <h2 id="q-h">Questions</h2>
+        <p class="muted">Anything else: <a class="link" href={`${base}#contact`}>ask the team</a>.</p>
+      </div>
+      <div class="faq">
+        {faq.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.q}</summary>
+            <p>{f.a}{f.verify && <span class="verify" title="Needs confirmation from APER" />}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .pdp {
+    padding-block: 32px var(--section);
+  }
+  .pdp-in {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  .pdp-media {
+    position: sticky;
+    top: 88px;
+  }
+  .crumb {
+    margin-bottom: 12px;
+  }
+  .pdp-info h1 {
+    margin-bottom: 14px;
+  }
+  .pdp-info .lead {
+    margin-bottom: 24px;
+  }
+  .price {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .price s {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .buy {
+    margin-top: 28px;
+  }
+  .buy fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+  .buy legend {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .opt {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: -1px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color var(--t-ui) var(--ease-out);
+  }
+  .opt:hover {
+    background: var(--paper-2);
+  }
+  .opt input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .opt:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    z-index: 1;
+    background: #fff;
+  }
+  .opt:has(input:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .opt-name {
+    font-weight: 600;
+  }
+  .opt-price {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: center;
+    font-weight: 600;
+  }
+  .sum {
+    margin: 16px 0 16px;
+  }
+  .buy-btn {
+    width: 100%;
+    min-height: 54px;
+    margin-bottom: 10px;
+  }
+  .usp {
+    margin-top: 32px;
+  }
+
+  .ov {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+
+  .feats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .fig {
+    margin: 0 0 20px;
+    background: var(--paper-2);
+    padding: 28px 24px;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+  }
+  .fig svg {
+    width: 100%;
+    height: auto;
+  }
+  .feats h3 {
+    margin-bottom: 10px;
+  }
+  .ann path {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .ann text {
+    font-family: var(--font);
+    font-size: 22px;
+    font-weight: 500;
+    fill: var(--ink);
+  }
+
+  .sizer {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .sz-control h2 {
+    margin-bottom: 16px;
+  }
+  .sz-label {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin: 32px 0 8px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 44px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--text-dark-2);
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px;
+    background: var(--text-dark-2);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: -10px;
+    border-radius: 50%;
+    background: var(--text-dark);
+    transition: transform var(--t-press) var(--ease-out);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--text-dark);
+  }
+  input[type="range"]:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  .sz-result {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .sz-size {
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    min-width: 2ch;
+  }
+  .sz-fig {
+    margin: 0;
+    --bike-dark: #4a4e54;
+    --bike-pocket: #8d9196;
+    --bike-tyre: #2e3136;
+    --bike-rim: #4a4e54;
+  }
+  .geo-wrap {
+    margin-top: 56px;
+  }
+  .specs {
+    min-width: 900px;
+  }
+
+  .order {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .order li {
+    border-top: 1px solid var(--ink);
+    padding-top: 16px;
+  }
+  .order h3 {
+    margin-bottom: 8px;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+  .faq-grid h2 {
+    margin-bottom: 12px;
+  }
+  .faq {
+    border-top: 1px solid var(--line);
+  }
+  .faq details {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 0;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary::after {
+    content: "+";
+    font-weight: 400;
+    transition: transform var(--t-ui) var(--ease-out);
+  }
+  .faq details[open] summary::after {
+    transform: rotate(45deg);
+  }
+  .faq details p {
+    margin: 0 0 20px;
+  }
+
+  @media (max-width: 860px) {
+    .pdp {
+      padding-top: 0;
+    }
+    .pdp-in,
+    .ov,
+    .sizer,
+    .faq-grid {
+      grid-template-columns: 1fr;
+    }
+    .pdp-in > * {
+      min-width: 0;
+    }
+    .pdp-media {
+      position: static;
+      margin-inline: calc(-1 * var(--margin));
+    }
+    .feats,
+    .order {
+      grid-template-columns: 1fr;
+      row-gap: 40px;
+    }
+  }
+</style>
+
+<script>
+  import { drawBike, WHEEL_R } from "../lib/bike";
+  import { builds, deposit, eur } from "../data/dryad";
+
+  // Build picker in the buy box: radio buttons update price, summary and the reserve link.
+  const buy = document.querySelector<HTMLElement>("[data-buy]");
+  if (buy) {
+    const price = document.querySelector<HTMLElement>("[data-price]")!;
+    const was = document.querySelector<HTMLElement>("[data-was]")!;
+    const sum = buy.querySelector<HTMLElement>("[data-sum]")!;
+    const split = buy.querySelector<HTMLElement>("[data-split]")!;
+    const go = buy.querySelector<HTMLAnchorElement>("[data-go]")!;
+    buy.addEventListener("change", (e) => {
+      const id = (e.target as HTMLInputElement).value;
+      const b = builds.find((x) => x.id === id)!;
+      price.textContent = eur(b.preorder);
+      was.textContent = eur(b.standard);
+      sum.textContent = b.id === "frameset" ? b.note : `${b.groupset}. ${b.wheels} wheels.`;
+      split.textContent = `${eur(deposit)} deposit today, ${eur(b.preorder - deposit)} on completion.`;
+      go.href = `https://aper-bikes.com/product/dryad/?build=${b.id}`;
+    });
+  }
+
+  // FAQ: native <details>, one open at a time.
+  const qs = [...document.querySelectorAll<HTMLDetailsElement>(".faq details")];
+  qs.forEach((d) => d.addEventListener("toggle", () => d.open && qs.forEach((o) => o !== d && (o.open = false))));
+
+  // Size finder: the bike redraws from the geometry of the matching size.
+  const sizer = document.querySelector<HTMLElement>("[data-sizer]");
+  if (sizer) {
+    type G = Parameters<typeof drawBike>[0] & { size: string; rider: [number, number | null] };
+    const geo: G[] = JSON.parse(sizer.dataset.geo!);
+    const input = sizer.querySelector<HTMLInputElement>("#height")!;
+    const out = sizer.querySelector<HTMLOutputElement>("#h-out")!;
+    const sizeOut = sizer.querySelector<HTMLElement>("[data-size-out]")!;
+    const why = sizer.querySelector<HTMLElement>("[data-size-why]")!;
+    const svg = document.getElementById("sizer-bike")!;
+    const part = (k: string) => svg.querySelector<SVGPathElement>(`[data-part="${k}"]`)!;
+    const wheels = { rear: svg.querySelector('[data-wheel="rear"]')!, front: svg.querySelector('[data-wheel="front"]')! };
+    const dims = {
+      stack: svg.querySelector('[data-dim="stack"]')!,
+      reach: svg.querySelector('[data-dim="reach"]')!,
+      stackL: svg.querySelector<SVGTextElement>('[data-dimlabel="stack"]')!,
+      reachL: svg.querySelector<SVGTextElement>('[data-dimlabel="reach"]')!,
+    };
+    const cells = document.querySelectorAll<HTMLElement>("[data-geo-table] [data-col]");
+    const keys = ["headAngle", "seatAngle", "chainstay", "stack", "reach", "bbDrop", "seatTube", "headTube", "wheelbase"] as const;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let current: Record<string, number> = Object.fromEntries(keys.map((k) => [k, geo[2][k]]));
+    let target = { ...current };
+    let raf = 0;
+
+    const render = (g: Record<string, number>) => {
+      const d = drawBike(g as any);
+      part("parts").setAttribute("d", d.parts);
+      part("stays").setAttribute("d", d.stays);
+      part("fork").setAttribute("d", d.fork);
+      part("forkPockets").setAttribute("d", d.forkPockets);
+      part("framePockets").setAttribute("d", d.frame + d.pockets);
+      part("ground").setAttribute("d", `M-840 ${d.ground} H1120`);
+      wheels.rear.setAttribute("transform", `translate(${d.wheels.rear[0]} ${d.wheels.rear[1]})`);
+      wheels.front.setAttribute("transform", `translate(${d.wheels.front[0]} ${d.wheels.front[1]})`);
+      const [hx, hy] = d.points.htTop;
+      dims.stack.setAttribute("d", `M${hx + 120} 0 V${hy}`);
+      dims.reach.setAttribute("d", `M0 ${hy - 70} H${hx}`);
+      dims.stackL.setAttribute("x", String(hx + 140));
+      dims.stackL.setAttribute("y", String(hy / 2));
+      dims.reachL.setAttribute("x", String(hx / 2));
+      dims.reachL.setAttribute("y", String(hy - 90));
+    };
+
+    // Critically damped approach toward the target; restarts from the current drawn values when retargeted.
+    const tick = () => {
+      let moving = false;
+      for (const k of keys) {
+        const diff = target[k] - current[k];
+        if (Math.abs(diff) > 0.05) {
+          current[k] += diff * 0.18;
+          moving = true;
+        } else current[k] = target[k];
+      }
+      render(current);
+      raf = moving ? requestAnimationFrame(tick) : 0;
+    };
+
+    const pick = (h: number) => {
+      const fits = geo.filter((g) => h >= g.rider[0] && (g.rider[1] === null || h <= g.rider[1]));
+      if (fits.length) return { g: fits[0], fits };
+      return { g: h < geo[0].rider[0] ? geo[0] : geo[geo.length - 1], fits: [] as G[] };
+    };
+
+    const update = () => {
+      const h = Number(input.value);
+      out.textContent = `${h} cm`;
+      const { g, fits } = pick(h);
+      const mid = (s: G) => (s.rider[0] + (s.rider[1] ?? s.rider[0] + 10)) / 2;
+      const sel = fits.length === 2 ? (Math.abs(h - mid(fits[0])) <= Math.abs(h - mid(fits[1])) ? fits[0] : fits[1]) : g;
+      sizeOut.textContent = sel.size;
+      const range = (s: G) => (s.rider[1] ? `${s.rider[0]}–${s.rider[1]} cm` : `${s.rider[0]} cm and up`);
+      why.textContent =
+        fits.length === 2
+          ? `You are between ${fits[0].size} and ${fits[1].size}. ${fits[0].size} rides shorter and lower, ${fits[1].size} longer and taller. Worth a message to APER.`
+          : fits.length === 1
+            ? `${range(sel)} fits size ${sel.size}. Stack ${sel.stack} mm, reach ${sel.reach} mm.`
+            : `Outside the published range. Ask APER about ${sel.size}.`;
+      cells.forEach((c) => c.classList.toggle("on", c.dataset.col === sel.size));
+      for (const k of keys) target[k] = sel[k];
+      dims.stackL.textContent = `Stack ${sel.stack}`;
+      dims.reachL.textContent = `Reach ${sel.reach}`;
+      svg.setAttribute("aria-label", `DRYAD size ${sel.size}, stack ${sel.stack} mm, reach ${sel.reach} mm`);
+      if (reduce) {
+        current = { ...target };
+        render(current);
+      } else if (!raf) raf = requestAnimationFrame(tick);
+    };
+    input.addEventListener("input", update);
+    update();
+  }
+</script>

@@ -1,0 +1,24 @@
+---
+// Placeholder photo. `shot` is the brief for the real photograph that replaces it (kept in data-shot and alt).
+import { placeholder } from "../data/media";
+interface Props {
+  shot: string;
+  ratio?: string;
+  pos?: string; // object-position, to crop the single placeholder differently per slot
+  class?: string;
+  eager?: boolean;
+}
+const { shot, ratio = "4 / 3", pos = "50% 72%", class: cls, eager = false } = Astro.props;
+---
+
+<figure class:list={["photo", cls]} style={`aspect-ratio:${ratio}`} data-shot={shot}>
+  <img
+    src={placeholder.src}
+    width={placeholder.width}
+    height={placeholder.height}
+    alt={`Placeholder. Planned photo: ${shot}`}
+    loading={eager ? "eager" : "lazy"}
+    decoding="async"
+    style={`object-position:${pos}`}
+  />
+</figure>

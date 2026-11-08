@@ -1,0 +1,50 @@
+---
+import { drawBike, VIEW, WHEEL_R } from "../lib/bike";
+import { geometry, type Size } from "../data/dryad";
+interface Props {
+  size?: Size;
+  id?: string;
+  dims?: boolean;
+  label?: string;
+  class?: string;
+}
+const { size = "M", id, dims = false, label, class: cls } = Astro.props;
+const g = geometry.find((s) => s.size === size)!;
+const d = drawBike(g);
+const W = (c: [number, number]) => c;
+---
+
+<svg
+  class:list={["bike", cls]}
+  id={id}
+  viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
+  role="img"
+  aria-label={label ?? `Drawing of the DRYAD, size ${size}, generated from APER's published geometry`}
+  data-size={size}
+>
+  <g class="bike-wheels">
+    {[d.wheels.rear, d.wheels.front].map((c, i) => (
+      <g data-wheel={i === 0 ? "rear" : "front"} transform={`translate(${W(c)[0]} ${W(c)[1]})`}>
+        <circle r={WHEEL_R - 22} class="tyre" />
+        <circle r={WHEEL_R - 60} class="rim" />
+        <circle r="22" class="hub" />
+      </g>
+    ))}
+  </g>
+  <path class="bike-parts" d={d.parts} data-part="parts" />
+  <path class="bike-stays" d={d.stays} data-part="stays" />
+  <path class="bike-fork" d={d.fork} data-part="fork" />
+  <path class="bike-fork-pockets" d={d.forkPockets} data-part="forkPockets" />
+  <path class="bike-frame" d={d.frame + d.pockets} fill-rule="evenodd" data-part="framePockets" />
+  {
+    dims && (
+      <g class="bike-dims" aria-hidden="true">
+        <path data-dim="stack" d={`M${d.points.htTop[0] + 120} 0 V${d.points.htTop[1]}`} />
+        <path data-dim="reach" d={`M0 ${d.points.htTop[1] - 70} H${d.points.htTop[0]}`} />
+        <text data-dimlabel="stack" x={d.points.htTop[0] + 140} y={d.points.htTop[1] / 2}>Stack {g.stack}</text>
+        <text data-dimlabel="reach" x={d.points.htTop[0] / 2} y={d.points.htTop[1] - 90} text-anchor="middle">Reach {g.reach}</text>
+      </g>
+    )
+  }
+  <path class="bike-ground" d={`M${VIEW.x} ${d.ground} H${VIEW.x + VIEW.w}`} data-part="ground" />
+</svg>
