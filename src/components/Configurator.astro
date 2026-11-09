@@ -1,0 +1,536 @@
+---
+// Product page top: gallery left, step-by-step configurator right.
+// Steps open one at a time; choosing an option collapses the step to a one-line summary and opens the next.
+import { photos, type PhotoKey } from "../data/media";
+import { deposit, type Bike } from "../data/catalog";
+import { eur, facts, geometry } from "../data/dryad";
+interface Props { bike: Bike }
+const { bike } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const isDryad = bike.slug === "dryad";
+
+interface Opt { value: string; label: string; sub?: string; price?: string }
+interface Step { id: string; title: string; options: Opt[]; skipIf?: [string, string]; layout?: "boxes" | "rows" | "sizes"; help?: string }
+
+const b = (id: string) => bike.builds.find((x) => x.id === id)!;
+const steps: Step[] = isDryad
+  ? [
+      { id: "type", title: "Build type", layout: "boxes", options: [
+        { value: "complete", label: "Complete bike", sub: `From ${eur(b("2-11").price)}` },
+        { value: "frameset", label: "Frameset only", sub: eur(b("frameset").price) },
+      ] },
+      { id: "groupset", title: "Groupset", layout: "rows", skipIf: ["type", "frameset"], options: bike.builds.filter((x) => x.id !== "frameset").map((x) => ({ value: x.id, label: x.bullets[0], sub: `DRYAD ${x.short} · ${x.bullets[1]}`, price: eur(x.price) })) },
+      { id: "size", title: "Frame size", layout: "sizes", help: "Find your size", options: geometry.map((g) => ({ value: g.size, label: g.size, sub: g.rider[1] ? `${g.rider[0]}–${g.rider[1]} cm` : `${g.rider[0]}+ cm` })) },
+    ]
+  : [
+      { id: "model", title: "Model", layout: "rows", options: bike.builds.map((x) => ({ value: x.id, label: x.name.replace("KOMPace ", ""), sub: x.bullets.slice(0, 2).join(" · "), price: eur(x.price) })) },
+      { id: "colour", title: "Colour", layout: "boxes", options: [
+        { value: "black", label: "Black anodised", sub: "Included" },
+        { value: "colour", label: "Coloured anodising", sub: "+€300" },
+      ] },
+      { id: "size", title: "Frame size", layout: "sizes", options: ["S1", "S2", "S3"].map((s) => ({ value: s, label: s })) },
+    ];
+
+const cfg = {
+  isDryad,
+  deposit,
+  steps: steps.map((s) => ({ id: s.id, skipIf: s.skipIf ?? null, labels: Object.fromEntries(s.options.map((o) => [o.value, o.label])) })),
+  builds: Object.fromEntries(bike.builds.map((x) => [x.id, { name: x.name, price: x.price, was: x.was ?? null, shop: x.shop, wheels: x.bullets[1] }])),
+};
+const gallery: [PhotoKey, string][] = isDryad
+  ? [["dryadWorkshop", "50% 70%"], ["dryadOnMill", "50% 60%"], ["dryadWorkshop", "50% 28%"], ["ribDetail", "50% 50%"]]
+  : [["kompaceStudio", "50% 55%"], ["kompaceBespoked", "50% 55%"], ["kompaceForest", "50% 60%"], ["kompaceDrivetrain", "50% 50%"]];
+---
+
+<section class="pdp light" id="buy" aria-labelledby="pdp-h">
+  <div class="wrap">
+    <p class="crumb small"><a href={base}>Home</a> / {bike.name}</p>
+    <div class="pdp-in">
+      <div class="gal" data-gallery>
+        <div class="gal-main">
+          {gallery.map(([k, pos], i) => (
+            <img src={photos[k].src} width={photos[k].width} height={photos[k].height} alt={`${bike.name}, image ${i + 1}`} style={`object-position:${pos}`} data-slide={i} hidden={i !== 0} loading={i === 0 ? "eager" : "lazy"} />
+          ))}
+        </div>
+        <div class="gal-thumbs" role="group" aria-label="Choose image">
+          {gallery.map(([k, pos], i) => (
+            <button type="button" data-thumb={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={`Image ${i + 1}`}>
+              <img src={photos[k].src} alt="" style={`object-position:${pos}`} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <form class="cfg" data-cfg={JSON.stringify(cfg)} onsubmit="return false">
+        <p class="kicker small muted">{bike.chips.map(([, v]) => v).slice(0, 3).join(" · ")}</p>
+        <h1 id="pdp-h">{bike.name}</h1>
+        <p class="tag">{bike.tagline}</p>
+        <p class="price num" data-price>From {eur(bike.from)}</p>
+        <p class="small avail"><span class="dot" aria-hidden="true"></span>{isDryad ? `Pre-order · first deliveries from ${facts.delivery}` : "Available · built to order in Patras"}</p>
+
+        <ol class="steps">
+          {steps.map((s, i) => (
+            <li class="step" data-step={s.id} data-state={i === 0 ? "open" : "closed"}>
+              <button type="button" class="step-head" aria-expanded={i === 0 ? "true" : "false"} aria-controls={`st-${s.id}`}>
+                <span class="step-title">{s.title}</span>
+                <span class="step-val" data-val></span>
+                <span class="step-edit small">Change</span>
+              </button>
+              <div class="step-body" id={`st-${s.id}`}><div class="step-inner">
+                <fieldset class:list={["opts", s.layout]}>
+                  <legend class="sr">{s.title}</legend>
+                  {s.options.map((o) => (
+                    <label class="opt">
+                      <input type="radio" name={s.id} value={o.value} />
+                      <span class="opt-box">
+                        <span class="opt-label">{o.label}</span>
+                        {o.sub && <span class="opt-sub">{o.sub}</span>}
+                        {o.price && <span class="opt-price num">{o.price}</span>}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+                {s.help && <a class="link small help" href="#size">{s.help}</a>}
+              </div></div>
+            </li>
+          ))}
+          <li class="step summary" data-step="summary" data-state="closed">
+            <div class="step-head static"><span class="step-title">Your {bike.name}</span></div>
+            <div class="step-body"><div class="step-inner">
+              <dl class="sum" data-sum></dl>
+              <a class="btn btn-solid cta" data-go href="#">{isDryad ? `Reserve with ${eur(deposit)} deposit` : "Buy on aper-bikes.com"}</a>
+              {isDryad && <p class="small muted" data-split></p>}
+              <p class="small muted">5-year frame warranty · Crash replacement · Built to order in Patras</p>
+            </div></div>
+          </li>
+        </ol>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pdp {
+    padding-block: 20px clamp(64px, 7vw, 112px);
+  }
+  .crumb {
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .crumb a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .crumb a:hover {
+    color: var(--ink);
+  }
+  .pdp-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(340px, 1fr);
+    gap: clamp(32px, 5vw, 88px);
+    align-items: start;
+  }
+  .gal {
+    position: sticky;
+    top: calc(var(--bar-h) + 24px);
+  }
+  .gal-main {
+    background: var(--paper-2);
+    aspect-ratio: 3 / 2;
+  }
+  .gal-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: fade 240ms var(--ease-out);
+  }
+  @keyframes fade {
+    from {
+      opacity: 0.4;
+    }
+  }
+  .gal-thumbs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .gal-thumbs button {
+    padding: 0;
+    border: 0;
+    aspect-ratio: 4 / 3;
+    background: var(--paper-2);
+    position: relative;
+  }
+  .gal-thumbs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.65;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .gal-thumbs button:hover img,
+  .gal-thumbs button[aria-pressed="true"] img {
+    opacity: 1;
+  }
+  .gal-thumbs button[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+  }
+
+  .kicker {
+    margin-bottom: 10px;
+  }
+  .cfg h1 {
+    font-size: clamp(2.5rem, 1.6rem + 2.6vw, 3.75rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    margin-bottom: 12px;
+  }
+  .tag {
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .price {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .price :global(s) {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .avail {
+    max-width: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin: 0;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .step {
+    border-bottom: 1px solid var(--line);
+  }
+  .step-head {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 16px;
+    background: none;
+    border: 0;
+    padding: 18px 0;
+    text-align: left;
+  }
+  .step-title {
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+  .step-val {
+    color: var(--ink);
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .step-edit {
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    opacity: 0;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .step[data-state="done"] .step-edit {
+    opacity: 1;
+  }
+  .step[data-state="done"] .step-head:hover .step-edit {
+    color: var(--ink);
+  }
+  .step[data-state="closed"] .step-head {
+    color: var(--muted);
+    cursor: default;
+  }
+  .step[data-state="closed"] .step-title {
+    color: color-mix(in srgb, var(--ink) 40%, transparent);
+  }
+  .step[data-state="skip"] {
+    display: none;
+  }
+  .step-head.static {
+    display: block;
+  }
+  .step-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 360ms var(--ease-in-out),
+      opacity 240ms var(--ease-out);
+  }
+  .step-body > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .step[data-state="open"] .step-body {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .step-body {
+    grid-template-columns: 1fr;
+  }
+  .step[data-state="open"] .step-inner {
+    padding-bottom: 22px;
+  }
+  .step[data-state="open"] .step-head {
+    padding-bottom: 12px;
+  }
+  .step[data-state="open"] .step-val {
+    visibility: hidden;
+  }
+
+  .opts {
+    border: 0;
+    padding: 2px;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .opts.boxes {
+    grid-template-columns: 1fr 1fr;
+  }
+  .opts.sizes {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .opt {
+    position: relative;
+    cursor: pointer;
+  }
+  .opt input {
+    position: absolute;
+    opacity: 0;
+  }
+  .opt-box {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition: border-color var(--t-ui) var(--ease-out), background-color var(--t-ui) var(--ease-out);
+  }
+  .opt:hover .opt-box {
+    border-color: var(--ink);
+  }
+  .opt input:checked + .opt-box {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .opt input:focus-visible + .opt-box {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .opt:active .opt-box {
+    transform: scale(0.99);
+  }
+  .opt-label {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .opt-sub {
+    grid-column: 1;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .opt-price {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    font-size: 0.9375rem;
+  }
+  .sizes .opt-box {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 12px 6px;
+  }
+  .sizes .opt-sub {
+    font-size: 0.6875rem;
+  }
+  .help {
+    display: inline-block;
+    margin-top: 12px;
+  }
+
+  .sum {
+    margin: 0 0 18px;
+  }
+  .sum :global(div) {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+    font-size: 0.9375rem;
+  }
+  .sum :global(dt) {
+    color: var(--muted);
+  }
+  .sum :global(dd) {
+    margin: 0;
+    text-align: right;
+  }
+  .sum :global(.total) {
+    border-top: 1px solid var(--line);
+    margin-top: 6px;
+    padding-top: 12px;
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+  .sum :global(.total dt) {
+    color: var(--ink);
+  }
+  .cta {
+    width: 100%;
+    min-height: 52px;
+    margin-bottom: 10px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .step-body {
+      transition: none;
+    }
+  }
+  @media (max-width: 960px) {
+    .pdp-in {
+      grid-template-columns: 1fr;
+    }
+    .gal {
+      position: static;
+      margin-inline: calc(-1 * var(--margin));
+    }
+    .gal-thumbs {
+      grid-template-columns: repeat(4, 1fr);
+      padding-inline: var(--margin);
+    }
+  }
+  @media (max-width: 420px) {
+    .opts.sizes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  import { eur } from "../data/dryad";
+  document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((g) => {
+    const slides = [...g.querySelectorAll<HTMLImageElement>("[data-slide]")];
+    const thumbs = [...g.querySelectorAll<HTMLButtonElement>("[data-thumb]")];
+    thumbs.forEach((t, i) =>
+      t.addEventListener("click", () => {
+        slides.forEach((s, j) => (s.hidden = j !== i));
+        thumbs.forEach((x, j) => x.setAttribute("aria-pressed", String(j === i)));
+      }),
+    );
+  });
+
+  type Cfg = {
+    isDryad: boolean;
+    deposit: number;
+    steps: { id: string; skipIf: [string, string] | null; labels: Record<string, string> }[];
+    builds: Record<string, { name: string; price: number; was: number | null; shop: string; wheels: string }>;
+  };
+
+  document.querySelectorAll<HTMLFormElement>("[data-cfg]").forEach((form) => {
+    const cfg: Cfg = JSON.parse(form.dataset.cfg!);
+    const pick: Record<string, string> = {};
+    const el = (id: string) => form.querySelector<HTMLElement>(`[data-step="${id}"]`)!;
+    const summary = el("summary");
+    const priceEl = form.querySelector<HTMLElement>("[data-price]")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const skipped = (s: Cfg["steps"][number]) => !!s.skipIf && pick[s.skipIf[0]] === s.skipIf[1];
+    const active = () => cfg.steps.filter((s) => !skipped(s));
+
+    const buildId = () => (cfg.isDryad ? (pick.type === "frameset" ? "frameset" : pick.groupset) : pick.model);
+    const total = () => {
+      const b = cfg.builds[buildId() ?? ""];
+      if (!b) return null;
+      return { b, price: b.price + (!cfg.isDryad && pick.colour === "colour" ? 300 : 0) };
+    };
+
+    const setState = (id: string, state: string) => {
+      const s = el(id);
+      s.dataset.state = state;
+      s.querySelector(".step-head")?.setAttribute("aria-expanded", String(state === "open"));
+    };
+
+    const render = (openId: string | null) => {
+      for (const s of cfg.steps) {
+        const node = el(s.id);
+        if (skipped(s)) {
+          setState(s.id, "skip");
+          continue;
+        }
+        node.querySelector<HTMLElement>("[data-val]")!.textContent = pick[s.id] ? s.labels[pick[s.id]] : "";
+        setState(s.id, s.id === openId ? "open" : pick[s.id] ? "done" : "closed");
+      }
+      const complete = active().every((s) => pick[s.id]);
+      setState("summary", complete && !openId ? "open" : "closed");
+
+      const t = total();
+      priceEl.innerHTML = t ? `${eur(t.price)}${t.b.was ? ` <s>${eur(t.b.was)}</s>` : ""}` : priceEl.dataset.from ?? priceEl.innerHTML;
+      if (complete && t) {
+        const rows: [string, string][] = cfg.isDryad
+          ? [["Build", t.b.name], ...(pick.type === "complete" ? [["Wheels", t.b.wheels] as [string, string]] : []), ["Size", pick.size], ["Colour", "Gold"]]
+          : [["Model", t.b.name], ["Colour", cfg.steps[1].labels[pick.colour]], ["Size", pick.size]];
+        form.querySelector("[data-sum]")!.innerHTML =
+          rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("") +
+          `<div class="total"><dt>Total</dt><dd>${eur(t.price)}</dd></div>`;
+        const go = form.querySelector<HTMLAnchorElement>("[data-go]")!;
+        go.href = cfg.isDryad ? `${t.b.shop}?build=${buildId()}&size=${pick.size}` : t.b.shop;
+        const split = form.querySelector("[data-split]");
+        if (split) split.textContent = `${eur(cfg.deposit)} today, ${eur(t.price - cfg.deposit)} when your bike is finished.`;
+      }
+    };
+    priceEl.dataset.from = priceEl.innerHTML;
+
+    form.addEventListener("change", (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.type !== "radio") return;
+      pick[input.name] = input.value;
+      // Changing the build type can make a later choice irrelevant; drop it if it is now skipped.
+      const order = active();
+      const next = order.find((s) => !pick[s.id]);
+      const delay = reduce ? 0 : 180; // let the selected border show before the step folds away
+      setTimeout(() => {
+        render(next ? next.id : null);
+        if (!next) summary.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+      }, delay);
+    });
+
+    form.querySelectorAll<HTMLButtonElement>(".step-head:not(.static)").forEach((h) =>
+      h.addEventListener("click", () => {
+        const id = h.closest<HTMLElement>("[data-step]")!.dataset.step!;
+        const st = el(id).dataset.state;
+        if (st === "done") render(id);
+        else if (st === "open" && pick[id]) render(null);
+      }),
+    );
+
+    render(cfg.steps[0].id);
+  });
+</script>
