@@ -5,5 +5,5 @@ export default defineConfig({
   base: "/aper-concept",
   output: "static",
   trailingSlash: "ignore",
-  build: { assets: "assets" },
+  build: { assets: "assets", inlineStylesheets: "always" },
 });

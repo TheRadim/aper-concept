@@ -1,0 +1,990 @@
+---
+// A printable proposal (A4 landscape pages) for the first message to APER.
+// Open in a browser and print / save as PDF. Photos load from aper-bikes.com.
+import Bike from "../components/Bike.astro";
+import { photos, logo } from "../data/media";
+import { drawBike, VIEW, WHEEL_R } from "../lib/bike";
+import { geometry } from "../data/dryad";
+const g = geometry.find((x) => x.size === "M")!;
+const d = drawBike(g);
+const stages = [
+  { t: "Design", layers: ["outline"] },
+  { t: "Machine", layers: ["outline", "down"] },
+  { t: "Fork and join", layers: ["down", "fork", "rest"] },
+  { t: "Build", layers: ["down", "fork", "rest", "wheels"] },
+];
+const acc = [
+  { n: "Rear Derailleur Pulley Set", p: "€55", i: "https://aper-bikes.com/wp-content/uploads/2025/01/shimano-pulleys-set-768x492.jpg" },
+  { n: "Headset End-Cap", p: "€16", i: "https://aper-bikes.com/wp-content/uploads/2025/01/end-cap-768x377.jpg" },
+  { n: "APER Thru Axle", p: "€34", i: "https://aper-bikes.com/wp-content/uploads/2023/11/20240411_67_edit-768x512.jpg" },
+  { n: "APER T-Shirt, WRL", p: "€35", i: "https://aper-bikes.com/wp-content/uploads/2024/07/20240625_100__-768x512.jpg" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>APER Bikes · Website proposal · Radim Theiner</title>
+  </head>
+  <body>
+    <main class="deck">
+      <!-- 1 Cover -->
+      <section class="slide cover">
+        <img class="cover-img" src={photos.dryadOnMill.src} alt="" />
+        <div class="cover-shade"></div>
+        <div class="cover-in">
+          <div class="brand"><span class="boar"><img src={logo} alt="" /></span><span>APER</span></div>
+          <div>
+            <p class="eyebrow-l">Website proposal</p>
+            <h1>Showing what you machine.</h1>
+            <p class="lede">Ideas for a clearer, more confident APER website, from structure to product pages.</p>
+          </div>
+          <p class="by">Prepared for Nikos and Giorgos by Radim Theiner · Copenhagen · November 2026</p>
+        </div>
+      </section>
+
+      <!-- 2 Why -->
+      <section class="slide">
+        <header class="sh"><span class="no">01</span><h2>Why I'm writing</h2></header>
+        <div class="two">
+          <div class="letter">
+            <p class="big">It was great to meet you in Copenhagen. Since then I've kept thinking about how to show what makes APER different: two engineers who design, program and machine every frame themselves.</p>
+            <p>Your bikes already have the story most brands try to invent. The website just doesn't tell it yet. These pages show what I'd change and why, using your real products, prices and geometry.</p>
+            <p>No commitment needed. If any of it is useful, I'd love to talk about how we could do it together.</p>
+          </div>
+          <div class="goals">
+            <h3>Three goals</h3>
+            <ol>
+              <li><strong>Explain the engineering</strong><span>RibLogic, the one-piece fork and the Rising Pivot, shown so a rider understands them in seconds.</span></li>
+              <li><strong>Make buying easy</strong><span>Clear builds, prices, sizes and a simple path from "interested" to "reserved".</span></li>
+              <li><strong>Build trust</strong><span>Warranty, crash replacement, shipping and the people behind APER, visible where buyers decide.</span></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 Today -->
+      <section class="slide">
+        <header class="sh"><span class="no">02</span><h2>Where the site is today</h2></header>
+        <div class="two">
+          <div class="col">
+            <h3 class="ok">Already strong</h3>
+            <ul class="ticks">
+              <li>Prices, full component specs and geometry are public, which few boutique brands do.</li>
+              <li>The DRYAD page has a sensible order and real detail.</li>
+              <li>Great raw material: the gold DRYAD in front of the mill, the anodised KOMPace frames.</li>
+              <li>A five-year warranty and crash replacement many big brands don't match.</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h3 class="fix">Holding it back</h3>
+            <ul class="ticks">
+              <li>The homepage still introduces APER as an enduro brand; the DRYAD has no homepage section.</li>
+              <li>Navigation mixes bikes, a technology page and a 14-item shop menu.</li>
+              <li>Warranty, shipping and "no returns" sit in footer pages, away from the price.</li>
+              <li>Engineering is described in words rather than shown.</li>
+              <li>Expired offers, an uncaptioned gallery and mixed type styles.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="foot-note">Nothing here needs a rebuild of the shop: WooCommerce can stay. The changes are mostly structure, content and presentation.</p>
+      </section>
+
+      <!-- 4 Structure -->
+      <section class="slide">
+        <header class="sh"><span class="no">03</span><h2>A simpler structure</h2></header>
+        <p class="intro">Two bikes, so two clear destinations. Everything else supports the decision.</p>
+        <div class="map">
+          <div class="node root">Home</div>
+          <div class="branches">
+            <div class="branch"><div class="node main">DRYAD</div><ul><li>Configure and reserve</li><li>Features</li><li>Size finder and geometry</li><li>Compare builds</li><li>FAQ</li></ul></div>
+            <div class="branch"><div class="node main">KOMPace</div><ul><li>Configure and buy</li><li>Rising Pivot</li><li>Colours</li><li>Size and geometry</li><li>Frame specification</li></ul></div>
+            <div class="branch"><div class="node">Accessories</div><ul><li>Filterable shop</li><li>A page per part</li><li>Options: colour, size</li></ul></div>
+            <div class="branch"><div class="node">About</div><ul><li>Nikos, Giorgos and team</li><li>The boar of Erymanthos</li><li>From billet to bike</li></ul></div>
+            <div class="branch"><div class="node">Support</div><ul><li>Shipping and ordering</li><li>Warranty and crash replacement</li><li>Care, contact</li></ul></div>
+          </div>
+          <div class="node util">Bag · Account · Checkout</div>
+        </div>
+      </section>
+
+      <!-- 5 Product page -->
+      <section class="slide">
+        <header class="sh"><span class="no">04</span><h2>Product pages that guide the choice</h2></header>
+        <div class="two wide-left">
+          <div class="mock pdp">
+            <div class="pdp-top"><div><p class="k">7075-T6 machined · One-piece fork · 700C</p><p class="t">DRYAD</p></div><div class="pr">€3,250 <s>€3,822</s></div></div>
+            <div class="pdp-img"><img src={photos.dryadWorkshop.src} alt="" /></div>
+          </div>
+          <div class="mock steps">
+            <div class="st done"><span>Build type</span><b>Complete bike</b><i>Change</i></div>
+            <div class="st open"><span>Groupset</span>
+              <div class="opts">
+                <div class="o"><b>Shimano GRX 2×11</b><em>€2,520</em></div>
+                <div class="o on"><b>Shimano GRX 1×12</b><em>€3,250</em></div>
+                <div class="o"><b>SRAM Rival XPLR AXS 1×13</b><em>€3,657</em></div>
+              </div>
+            </div>
+            <div class="st"><span>Frame size</span></div>
+            <div class="st"><span>Your DRYAD</span></div>
+          </div>
+        </div>
+        <p class="caption">One big product image, then three short steps: build, groupset, size. Each choice folds away and opens the next, the price updates as you go, and it ends in a clear summary with the €400 deposit split.</p>
+      </section>
+
+      <!-- 6 Size finder -->
+      <section class="slide">
+        <header class="sh"><span class="no">05</span><h2>Your geometry, drawn live</h2></header>
+        <div class="two">
+          <div class="dark-panel">
+            <div class="bk"><Bike size="XS" dims /></div>
+            <div class="bk"><Bike size="XL" dims /></div>
+            <p class="small-l">XS and XL drawn from the DRYAD geometry table</p>
+          </div>
+          <div class="col">
+            <p class="big">A rider sets their height and the bike redraws itself from your published geometry, with stack and reach marked and the matching column lit up in the table.</p>
+            <p>With no dealers, this is the fitting you can't do in person. It uses your numbers only, nothing estimated, and points riders between two sizes to you.</p>
+            <p>For the KOMPace, the same idea switches between S1–S3 and the flip-chip's low and high settings.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 Story -->
+      <section class="slide dark">
+        <header class="sh"><span class="no">06</span><h2>From billet to bike</h2></header>
+        <p class="intro on-dark">An About page that tells your story and shows the process: as visitors scroll, a DRYAD takes shape step by step.</p>
+        <div class="stages">
+          {stages.map((s) => (
+            <figure>
+              <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}>
+                {s.layers.includes("outline") && <path d={d.frame + d.stays + d.fork} fill="none" stroke="#86868b" stroke-width="5" />}
+                {s.layers.includes("down") && <path d={d.pieces.down} fill="#d9a92f" />}
+                {s.layers.includes("down") && <path d={d.pockets} fill="#000" />}
+                {s.layers.includes("fork") && <path d={d.fork} fill="#3a3a3d" />}
+                {s.layers.includes("rest") && <path d={d.pieces.head + d.pieces.top + d.pieces.seat + d.pieces.shell + d.stays} fill="#d9a92f" />}
+                {s.layers.includes("wheels") && [d.wheels.rear, d.wheels.front].map((c) => <circle cx={c[0]} cy={c[1]} r={WHEEL_R - 22} fill="none" stroke="#3a3a3d" stroke-width="44" />)}
+                {s.layers.includes("wheels") && <path d={d.parts} fill="#48484c" />}
+              </svg>
+              <figcaption>{s.t}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <p class="caption on-dark">Design → Program → Machine → One-piece fork → Join → Build. Real workshop photos and a short film can be added to each step later.</p>
+      </section>
+
+      <!-- 8 Shop and trust -->
+      <section class="slide">
+        <header class="sh"><span class="no">07</span><h2>A real shop, and reasons to trust it</h2></header>
+        <div class="two">
+          <div>
+            <div class="cards">
+              {acc.map((a) => (<div class="card"><div class="ci"><img src={a.i} alt="" /></div><b>{a.n}</b><span>{a.p}</span></div>))}
+            </div>
+            <p class="caption">Accessories get their own pages with options (anodised colour, derailleur, size), one bag for bikes and parts, and a checkout that shows what's due today and what's due later.</p>
+          </div>
+          <div class="trust">
+            <div><b>5 years</b><span>Frame warranty, shown next to every price</span></div>
+            <div><b>35% off</b><span>Crash replacement for five years</span></div>
+            <div><b>Free</b><span>Shipping on every bike and frameset</span></div>
+            <div><b>Patras</b><span>Designed, machined and assembled in-house, by people with names</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 Design -->
+      <section class="slide">
+        <header class="sh"><span class="no">08</span><h2>Design direction</h2></header>
+        <div class="three">
+          <div>
+            <h3>Quiet, so the bikes speak</h3>
+            <p>White space, large photography and calm type. Gold, taken from the DRYAD frame, is used sparingly as the accent.</p>
+            <div class="sw"><i style="background:#1d1d1f"></i><i style="background:#f5f5f7;box-shadow:inset 0 0 0 1px #ddd"></i><i style="background:#d9a92f"></i><i style="background:#6e6e73"></i></div>
+          </div>
+          <div>
+            <h3>Precise, like a machined part</h3>
+            <p>Squared buttons, thin rules and exact numbers. Technical detail presented clearly, never as decoration.</p>
+            <div class="btns"><span class="b1">Add to bag</span><span class="b2">Explore</span></div>
+          </div>
+          <div>
+            <h3>Fast and easy to keep</h3>
+            <p>Mobile first, quick to load, and simple for you to update: prices, builds and geometry live in one place.</p>
+            <div class="type"><span class="tA">Aa</span><span class="tL">System type, sharp and readable at every size.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 Content -->
+      <section class="slide">
+        <header class="sh"><span class="no">09</span><h2>Photos that show the craft</h2></header>
+        <div class="two">
+          <div class="photos">
+            <img src={photos.kompaceStudio.src} alt="" />
+            <img src={photos.ribDetail.src} alt="" />
+            <img src={photos.kompaceForest.src} alt="" />
+          </div>
+          <div class="col">
+            <p class="big">The site works with your current photos. A short shoot would lift it most.</p>
+            <ul class="ticks">
+              <li>The DRYAD on white, drive side, for the product page</li>
+              <li>Macro details: rib pockets, the fork crown, the seatstay bushing, the M5 mounts</li>
+              <li>Riding: the DRYAD loaded for bikepacking</li>
+              <li>Nikos and Giorgos at the machine, working</li>
+            </ul>
+            <p>When the frames arrive in Copenhagen I'd be glad to shoot them. A workshop day in Patras could come later.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 Working together -->
+      <section class="slide">
+        <header class="sh"><span class="no">10</span><h2>How we could work together</h2></header>
+        <div class="opts3">
+          <div class="op">
+            <h3>Design</h3>
+            <p>Page designs for Home, DRYAD, KOMPace, Accessories, About and Support, with copy, ready for your developer to build.</p>
+            <p class="price">€800–1,000</p>
+          </div>
+          <div class="op rec">
+            <span class="tag">Suggested</span>
+            <h3>Design and build</h3>
+            <p>The same design, built by me in your WordPress and WooCommerce, mobile tested and launched together with you.</p>
+            <p class="price">€1,600–2,000</p>
+          </div>
+          <div class="op">
+            <h3>Photography</h3>
+            <p>Product and detail photos of the DRYAD in Copenhagen, ready for the site and social. Quoted separately once we know what arrives.</p>
+            <p class="price">Quoted separately</p>
+          </div>
+        </div>
+        <div class="timeline">
+          <div><b>December</b><span>Agree scope, collect content</span></div>
+          <div><b>December–January</b><span>Design, review, build</span></div>
+          <div><b>January 2027</b><span>Launch, in time for DRYAD deliveries</span></div>
+        </div>
+        <p class="foot-note">Indicative, startup-friendly pricing. Happy to work alongside your current developer or take care of the implementation myself.</p>
+      </section>
+
+      <!-- 12 Next -->
+      <section class="slide close">
+        <img class="cover-img" src={photos.kompaceWheelie.src} alt="" />
+        <div class="cover-shade"></div>
+        <div class="cover-in">
+          <div class="brand"><span class="boar"><img src={logo} alt="" /></span><span>APER</span></div>
+          <div>
+            <h2 class="end">Shall we talk?</h2>
+            <p class="lede">A 30-minute call is enough to go through these ideas and see what fits. I also have a working prototype of these pages to show you.</p>
+          </div>
+          <p class="by">Radim Theiner · Photographer, filmmaker and digital designer · Copenhagen</p>
+        </div>
+      </section>
+    </main>
+    <script is:inline>
+      // Fit the A4 pages to narrow screens; printing always uses full size.
+      const fit = () => document.documentElement.style.setProperty("--z", String(Math.min(1, (innerWidth - 24) / 1123)));
+      fit();
+      addEventListener("resize", fit);
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @page {
+    size: 297mm 210mm;
+    margin: 0;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    --ink: #1d1d1f;
+    --mut: #6e6e73;
+    --gold: #d9a92f;
+    --pap: #f5f5f7;
+    background: #e8e8ed;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+  }
+  .deck {
+    padding: 24px 0;
+    display: grid;
+    justify-content: center;
+    gap: 24px;
+  }
+  .slide {
+    zoom: var(--z, 1);
+    width: 1123px;
+    height: 794px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    padding: 64px 72px;
+    box-shadow: 0 10px 40px rgb(0 0 0 / 0.08);
+    display: flex;
+    flex-direction: column;
+  }
+  .slide.dark {
+    background: #000;
+    color: #f5f5f7;
+  }
+  @media print {
+    html {
+      background: #fff;
+    }
+    .deck {
+      padding: 0;
+      gap: 0;
+      display: block;
+    }
+    .slide {
+      zoom: 1;
+      box-shadow: none;
+      break-after: page;
+      page-break-after: always;
+    }
+  }
+  p {
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    letter-spacing: -0.03em;
+  }
+  .sh {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .no {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .sh h2 {
+    font-size: 40px;
+    line-height: 1.05;
+  }
+  .intro {
+    font-size: 19px;
+    color: var(--mut);
+    margin: -18px 0 28px;
+    max-width: 60ch;
+  }
+  .on-dark {
+    color: #a1a1a6;
+  }
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: start;
+    margin-block: auto;
+  }
+  .two.wide-left {
+    grid-template-columns: 1.35fr 1fr;
+    gap: 36px;
+  }
+  .three {
+    margin-block: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .three h3 {
+    font-size: 21px;
+    margin-bottom: 10px;
+  }
+  .three p {
+    color: var(--mut);
+    font-size: 15px;
+  }
+  .big {
+    font-size: 21px;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+  }
+  .col p,
+  .letter p {
+    font-size: 15px;
+    color: var(--mut);
+  }
+  .col .big,
+  .letter .big {
+    color: var(--ink);
+    font-size: 21px;
+  }
+  .foot-note,
+  .caption {
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--mut);
+    max-width: 90ch;
+  }
+  .caption {
+    margin-top: 18px;
+  }
+
+  /* Cover */
+  .cover,
+  .close {
+    padding: 0;
+    color: #fff;
+  }
+  .cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 62%;
+  }
+  .close .cover-img {
+    object-position: 50% 50%;
+  }
+  .cover-shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.35) 55%, rgb(0 0 0 / 0.25)),
+      linear-gradient(to right, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0) 65%);
+  }
+  .cover-in {
+    position: relative;
+    height: 100%;
+    padding: 56px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    font-size: 20px;
+  }
+  .boar {
+    width: 34px;
+    height: 38px;
+    overflow: hidden;
+  }
+  .boar img {
+    height: 64px;
+    margin: -8.5px 0 0 -20.5px;
+    filter: invert(1);
+  }
+  .eyebrow-l {
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .cover h1,
+  .end {
+    font-size: 76px;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    margin-bottom: 18px;
+    max-width: 12ch;
+  }
+  .lede {
+    font-size: 22px;
+    line-height: 1.35;
+    max-width: 34ch;
+    color: rgb(255 255 255 / 0.85);
+  }
+  .by {
+    font-size: 13px;
+    color: rgb(255 255 255 / 0.7);
+    margin: 0;
+  }
+
+  /* Goals */
+  .goals h3 {
+    font-size: 15px;
+    color: var(--mut);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .goals ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .goals li {
+    border-top: 1px solid #d2d2d7;
+    padding: 16px 0;
+    display: grid;
+    gap: 4px;
+  }
+  .goals strong {
+    font-size: 19px;
+  }
+  .goals span {
+    color: var(--mut);
+    font-size: 15px;
+  }
+  .col h3 {
+    font-size: 19px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid;
+    display: inline-block;
+  }
+  .col h3.ok {
+    border-color: var(--gold);
+  }
+  .col h3.fix {
+    border-color: var(--ink);
+  }
+  .ticks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+  }
+  .ticks li {
+    padding: 10px 0 10px 22px;
+    border-bottom: 1px solid #e5e5ea;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .ticks li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 10px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  /* Map */
+  .map {
+    margin-block: auto;
+    display: grid;
+    gap: 22px;
+    justify-items: center;
+  }
+  .node {
+    padding: 12px 22px;
+    border-radius: 6px;
+    border: 1.5px solid var(--ink);
+    font-weight: 600;
+    font-size: 16px;
+    background: #fff;
+  }
+  .node.root {
+    background: var(--ink);
+    color: #fff;
+  }
+  .node.main {
+    border-color: var(--gold);
+    box-shadow: inset 0 -3px 0 var(--gold);
+  }
+  .node.util {
+    border-style: dashed;
+    color: var(--mut);
+    font-weight: 500;
+  }
+  .branches {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    width: 100%;
+    position: relative;
+    padding-top: 22px;
+    border-top: 1.5px solid #d2d2d7;
+  }
+  .branch .node {
+    text-align: center;
+  }
+  .branch ul {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    font-size: 13.5px;
+    color: var(--mut);
+  }
+  .branch li {
+    padding: 6px 0;
+    border-bottom: 1px solid #ececf0;
+  }
+
+  /* Mocks */
+  .mock {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 0 0 1px #e5e5ea, 0 16px 40px rgb(0 0 0 / 0.06);
+    overflow: hidden;
+  }
+  .pdp {
+    padding: 22px;
+  }
+  .pdp-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 14px;
+  }
+  .pdp .k {
+    font-size: 11px;
+    color: var(--mut);
+    margin: 0 0 2px;
+  }
+  .pdp .t {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    margin: 0;
+    line-height: 1;
+  }
+  .pr {
+    font-weight: 600;
+    font-size: 18px;
+  }
+  .pr s {
+    color: var(--mut);
+    font-weight: 400;
+    font-size: 13px;
+  }
+  .pdp-img {
+    aspect-ratio: 2 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--pap);
+  }
+  .pdp-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 74%;
+  }
+  .steps {
+    padding: 8px 22px;
+  }
+  .st {
+    border-bottom: 1px solid #e5e5ea;
+    padding: 16px 0;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-weight: 600;
+    color: #b0b0b5;
+    flex-wrap: wrap;
+  }
+  .st.done,
+  .st.open {
+    color: var(--ink);
+  }
+  .st b {
+    margin-left: auto;
+    font-weight: 400;
+  }
+  .st i {
+    font-style: normal;
+    font-size: 12px;
+    color: var(--mut);
+    text-decoration: underline;
+  }
+  .st .opts {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .o {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #e5e5ea;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .o b {
+    margin: 0;
+  }
+  .o em {
+    font-style: normal;
+    font-weight: 400;
+  }
+  .o.on {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .dark-panel {
+    background: #000;
+    border-radius: 14px;
+    padding: 28px 28px 18px;
+    color: #f5f5f7;
+    --muted: #8e8e93;
+    --fg: #f5f5f7;
+    --line: rgb(255 255 255 / 0.15);
+  }
+  .dark-panel .bk + .bk {
+    margin-top: 6px;
+  }
+  .dark-panel svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .dark-panel .tyre {
+    fill: none;
+    stroke: #2e3136;
+    stroke-width: 44;
+  }
+  .dark-panel .rim {
+    fill: none;
+    stroke: #4a4e54;
+    stroke-width: 14;
+  }
+  .dark-panel .hub {
+    fill: #4a4e54;
+  }
+  .dark-panel .bike-frame,
+  .dark-panel .bike-stays {
+    fill: var(--gold);
+  }
+  .dark-panel .bike-fork,
+  .dark-panel .bike-parts {
+    fill: #4a4e54;
+  }
+  .dark-panel .bike-fork-pockets {
+    fill: #8d9196;
+  }
+  .dark-panel .bike-ground {
+    stroke: rgb(255 255 255 / 0.12);
+    stroke-width: 3;
+  }
+  .dark-panel .bike-dims path {
+    stroke: #8e8e93;
+    stroke-width: 3;
+    fill: none;
+    stroke-dasharray: 10 10;
+  }
+  .dark-panel .bike-dims text {
+    fill: #f5f5f7;
+    font-size: 44px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  .small-l {
+    font-size: 12px;
+    color: #8e8e93;
+    margin: 8px 0 0;
+  }
+  .stages {
+    margin-block: auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 12px;
+  }
+  .stages figure {
+    margin: 0;
+    background: #111;
+    border-radius: 12px;
+    padding: 26px 16px 16px;
+  }
+  .stages svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .stages figcaption {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #f5f5f7;
+    border-top: 2px solid var(--gold);
+    padding-top: 10px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .card {
+    background: var(--pap);
+    border-radius: 12px;
+    padding: 10px 10px 14px;
+    display: grid;
+    gap: 2px;
+    font-size: 13.5px;
+  }
+  .ci {
+    background: #fff;
+    border-radius: 8px;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .ci img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .card span {
+    color: var(--mut);
+  }
+  .trust {
+    display: grid;
+    gap: 0;
+  }
+  .trust div {
+    border-top: 1px solid #d2d2d7;
+    padding: 18px 0;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .trust b {
+    font-size: 26px;
+    letter-spacing: -0.03em;
+  }
+  .trust span {
+    color: var(--mut);
+    font-size: 15px;
+  }
+  .sw {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .sw i {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+  }
+  .btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btns span {
+    padding: 11px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .b1 {
+    background: var(--ink);
+    color: #fff;
+  }
+  .b2 {
+    border: 1px solid var(--ink);
+  }
+  .type {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-top: 18px;
+  }
+  .tA {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+  .tL {
+    font-size: 13px;
+    color: var(--mut);
+  }
+  .photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .photos img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 10px;
+    background: var(--pap);
+  }
+  .photos img:first-child {
+    grid-column: 1 / -1;
+    aspect-ratio: 2 / 1;
+    object-fit: contain;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #eee;
+  }
+  .opts3 {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .op {
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .op.rec {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .op .tag {
+    position: absolute;
+    top: -11px;
+    left: 20px;
+    background: var(--gold);
+    color: #000;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .op h3 {
+    font-size: 21px;
+    margin-bottom: 10px;
+  }
+  .op p {
+    font-size: 14.5px;
+    color: var(--mut);
+  }
+  .op .price {
+    margin: auto 0 0;
+    padding-top: 12px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .timeline div {
+    border-top: 2px solid var(--gold);
+    padding-top: 10px;
+    display: grid;
+    gap: 2px;
+  }
+  .timeline b {
+    font-size: 15px;
+  }
+  .timeline span {
+    font-size: 13.5px;
+    color: var(--mut);
+  }
+</style>

@@ -385,26 +385,27 @@ const rib = (i: number) => {
     transform: scale(1.15);
   }
   .sz-result {
-    display: grid;
-    grid-template-columns: 2.6ch 1fr;
-    align-items: start;
-    gap: 16px;
-    margin-top: 20px;
-    min-height: 6.5em; /* room for the longest explanation, so the slider never moves */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+    min-height: 9.5em; /* fixed room for the size and the longest explanation, so nothing moves */
   }
   .sz-result > span {
-    transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
   }
   .sz-result.swap > span {
     opacity: 0;
     transform: translateY(4px);
   }
   .sz-size {
-    font-size: 4rem;
+    font-size: 2.75rem;
     font-weight: 600;
     letter-spacing: -0.03em;
     line-height: 1;
-    min-width: 2ch;
+  }
+  .sz-result [data-size-why] {
+    max-width: 34ch;
   }
   .sz-fig {
     margin: 0;
@@ -412,6 +413,12 @@ const rib = (i: number) => {
     --bike-pocket: #8d9196;
     --bike-tyre: #2e3136;
     --bike-rim: #4a4e54;
+  }
+  .geo td,
+  .geo th {
+    transition:
+      background-color 700ms var(--ease-in-out),
+      color 700ms var(--ease-in-out);
   }
   .geo-wrap {
     margin-top: 56px;

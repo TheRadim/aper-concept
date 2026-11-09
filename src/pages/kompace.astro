@@ -221,6 +221,10 @@ const colours = [
   .kg-note {
     margin-bottom: 28px;
   }
+  .kgeo :global(td),
+  .kgeo :global(th) {
+    transition: background-color 700ms var(--ease-in-out), color 700ms var(--ease-in-out);
+  }
   .kgeo :global(td.on),
   .kgeo :global(th.on) {
     background: var(--paper-2);
