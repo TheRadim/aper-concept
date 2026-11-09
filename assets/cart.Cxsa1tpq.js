@@ -1,0 +1,17 @@
+var e=`aper-bag-v1`,t=e=>`€`+e.toLocaleString(`en-GB`),n=e=>e.replace(/[&<>"]/g,e=>({"&":`&amp;`,"<":`&lt;`,">":`&gt;`,'"':`&quot;`})[e]),r=()=>{try{return JSON.parse(localStorage.getItem(e)||`[]`)}catch{return[]}},i=t=>{try{localStorage.setItem(e,JSON.stringify(t))}catch{}a=t,document.dispatchEvent(new CustomEvent(`bag:change`))},a=r(),o=()=>a,s=(e=o())=>{let t=e.reduce((e,t)=>e+t.price*t.qty,0),n=e.reduce((e,t)=>e+(t.due??t.price)*t.qty,0);return{subtotal:t,due:n,hasBike:e.some(e=>e.kind!==`accessory`),count:e.reduce((e,t)=>e+t.qty,0),later:t-n}},c=(e,t=1)=>{let n=[...o()],r=n.find(t=>t.key===e.key);r?r.qty+=t:n.push({...e,qty:t}),i(n),S(),C()},l=(e,t)=>i(o().flatMap(n=>n.key===e?t>0?[{...n,qty:t}]:[]:[n])),u=()=>i([]),d=e=>`
+  <div class="line" data-key="${n(e.key)}">
+    <a href="${n(e.href)}"><img src="${n(e.img)}" alt="" /></a>
+    <div>
+      <h3>${n(e.name)}</h3>
+      <p class="meta">${n(e.meta)}</p>
+      <span class="qty"><button type="button" data-dec aria-label="Fewer">−</button><span>${e.qty}</span><button type="button" data-inc aria-label="More">+</button></span>
+    </div>
+    <div>
+      <p class="price num">${t(e.price*e.qty)}</p>
+      <button type="button" class="remove" data-remove>Remove</button>
+    </div>
+  </div>`,f=()=>{let e=s();return`
+    <div><span>Subtotal</span><span class="num">${t(e.subtotal)}</span></div>
+    <div><span>Shipping</span><span>${e.hasBike?`Free`:e.count?`From €7`:`—`}</span></div>
+    ${e.later?`<div><span>Due later (pre-order balance)</span><span class="num">${t(e.later)}</span></div>`:``}
+    <div class="grand"><span>Due today</span><span class="num">${t(e.due)}</span></div>`},p=e=>{e.addEventListener(`click`,e=>{let t=e.target,n=t.closest(`[data-key]`);if(!n)return;let r=o().find(e=>e.key===n.dataset.key);r&&(t.closest(`[data-inc]`)&&l(r.key,r.qty+1),t.closest(`[data-dec]`)&&l(r.key,r.qty-1),t.closest(`[data-remove]`)&&l(r.key,0))})},m=document.querySelector(`[data-cart-count]`),h=document.querySelector(`[data-sheet]`),g=document.querySelector(`[data-scrim]`),_=document.querySelector(`[data-cart-lines]`),v=document.querySelector(`[data-cart-totals]`),y=document.querySelector(`[data-cart-checkout]`),b=null,x=()=>{let e=o(),t=s();m&&(m.textContent=String(t.count),m.hidden=t.count===0),_&&(_.innerHTML=e.length?e.map(d).join(``):`<p class="empty">Your bag is empty.</p>`),v&&(v.innerHTML=e.length?f():``),y?.toggleAttribute(`hidden`,!e.length)},S=()=>{m&&(m.classList.remove(`bump`),m.offsetWidth,m.classList.add(`bump`))},C=()=>{b=document.activeElement,h?.setAttribute(`data-open`,`true`),h?.setAttribute(`aria-hidden`,`false`),g?.setAttribute(`data-open`,`true`),h?.querySelector(`[data-cart-close]`)?.focus()},w=()=>{h?.setAttribute(`data-open`,`false`),h?.setAttribute(`aria-hidden`,`true`),g?.setAttribute(`data-open`,`false`),b?.focus?.()};document.querySelectorAll(`[data-cart-open]`).forEach(e=>e.addEventListener(`click`,C)),h?.querySelector(`[data-cart-close]`)?.addEventListener(`click`,w),g?.addEventListener(`click`,w),document.addEventListener(`keydown`,e=>e.key===`Escape`&&h?.getAttribute(`data-open`)===`true`&&w()),_&&p(_),document.addEventListener(`bag:change`,x),addEventListener(`storage`,t=>{t.key===e&&(a=r(),x())}),x();export{r as a,d as i,p as n,s as o,u as r,f as s,c as t};
