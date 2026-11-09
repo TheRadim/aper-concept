@@ -13,6 +13,8 @@ const rows: [string, string][] = [
   ["Rear axle path", "Up to 45 mm rearward (APER figure)"],
   ["Frame", "CNC-machined 7075 aluminium"],
   ["Sizes", "S1, S2, S3"],
+  ["Frame weight", "from 4,080 g"],
+  ["Geometry", "Flip-chip, two settings"],
   ["Frameset", "from €3,969"],
   ["Complete bike", "from €7,769"],
   ["MY2026 Special Edition", "€12,969"],
@@ -25,7 +27,7 @@ const colours = [
 ] as const;
 ---
 
-<Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension. Concept outline." page="kompace">
+<Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension." page="kompace">
   <Configurator bike={bike} />
   <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Figures", "#figures"]]} />
 
@@ -79,7 +81,7 @@ const colours = [
       <h2 id="fig-h">Key figures</h2>
       <div class="table-wrap">
         <table><tbody>{rows.map(([a, b]) => <tr><th scope="row">{a}</th><td>{b}</td></tr>)}</tbody></table>
-        <p class="small muted">Figures from aper-bikes.com and BIKE magazine.</p>
+        
       </div>
     </div>
   </section>

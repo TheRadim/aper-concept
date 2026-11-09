@@ -4,7 +4,7 @@ import Photo from "../components/Photo.astro";
 import { builds, eur } from "../data/dryad";
 import { bikes } from "../data/catalog";
 import { accessories } from "../data/accessories";
-const featured = accessories.filter((a) => ["APER Thru Axle", "RD Hanger (UDH)", "Rear Derailleur Pulley Set", "APER Bikes T-Shirt"].includes(a.name));
+const featured = accessories.filter((a) => ["thru-axle", "pulley-set", "headset-end-caps", "t-shirt"].includes(a.slug));
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const from = builds.find((b) => b.id === "2-11")!.preorder;
 const steps = [
@@ -22,7 +22,7 @@ const service = [
 ];
 ---
 
-<Layout title="Bicycles machined in Patras" description="APER designs, programs, machines and assembles bicycles in Patras, Greece. Concept site." page="home">
+<Layout title="Bicycles machined in Patras" description="APER designs, programs, machines and assembles bicycles in Patras, Greece." page="home">
   <section class="hero dark" aria-labelledby="hero-h">
     <Photo img="dryadOnMill" alt="A machined DRYAD frame clamped on the mill table" shot="Hero: DRYAD on a gravel road in the Erymanthos foothills, or this frame on the mill shot fresh." ratio="auto" pos="50% 62%" class="hero-photo" eager />
     <div class="hero-scrim" aria-hidden="true"></div>
@@ -85,11 +85,11 @@ const service = [
     <div class="wrap">
       <div class="head-row">
         <h2 id="acc-h">Accessories and spares</h2>
-        <a class="link" href={`${base}accessories/`}>Shop all accessories</a>
+        <a class="link more" href={`${base}accessories/`}>Shop all accessories</a>
       </div>
       <div class="grid-cards acc4">
         {featured.map((a) => (
-          <a class="card" href={a.url}>
+          <a class="card" href={`${base}accessories/${a.slug}/`}>
             <figure class="photo acc-photo"><img src={a.img} alt={a.name} loading="lazy" /></figure>
             <div class="card-body">
               <h3>{a.name}</h3>
@@ -131,7 +131,7 @@ const service = [
         <h2 id="c-h">Questions before you order?</h2>
         <p class="muted">Sizing, builds or delivery to your country. The engineers answer themselves.</p>
       </div>
-      <form class="form" data-demo-form>
+      <form class="form" data-mail-form>
         <label>Name<input name="name" autocomplete="name" required /></label>
         <label>Email<input name="email" type="email" autocomplete="email" required /></label>
         <label class="full">Message<textarea name="q" rows="4"></textarea></label>
@@ -447,10 +447,14 @@ const service = [
 </style>
 
 <script>
-  document.querySelectorAll<HTMLFormElement>("[data-demo-form]").forEach((f) => {
+  // Opens the visitor's mail app with the message addressed to APER.
+  document.querySelectorAll<HTMLFormElement>("[data-mail-form]").forEach((f) => {
     f.addEventListener("submit", (e) => {
       e.preventDefault();
-      f.querySelector<HTMLElement>(".form-note")!.textContent = "Concept only. On the live site this goes straight to the team.";
+      const d = new FormData(f);
+      const body = `${d.get("q") ?? ""}\n\n${d.get("name") ?? ""}\n${d.get("email") ?? ""}`;
+      location.href = `mailto:info@aper-bikes.com?subject=${encodeURIComponent("Question from aper-bikes.com")}&body=${encodeURIComponent(body)}`;
+      f.querySelector<HTMLElement>(".form-note")!.textContent = "Your mail app should open with the message ready to send.";
     });
   });
 </script>

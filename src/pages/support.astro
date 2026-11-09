@@ -1,69 +1,121 @@
 ---
 import Layout from "../layouts/Layout.astro";
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const items = [
-  { h: "Warranty", p: "Frames and frame components carry a five-year warranty." },
-  { h: "Crash replacement", p: "Damage a frame in a crash within five years of purchase and APER offers a discounted replacement." },
-  { h: "Ordering a DRYAD", p: "A €400 deposit reserves a frame slot and locks the pre-order price. Size and build are confirmed with APER before production; the balance is paid on completion." },
-  { h: "Returns and changes", p: "APER does not offer returns, cancellations or direct exchanges. Each bike is built to order, so ask about sizing and specification before you reserve.", verify: true },
-  { h: "Shipping", p: "Shipping terms by country, costs and typical transit times.", verify: true },
-  { h: "Maintenance", p: "Clean the frame after rides. On the KOMPace, lubricate the Rising Pivot rail after every ride and wash. For adjustments, see a specialist workshop or ask APER." },
-  { h: "Spare parts", p: "Thru axles, derailleur hangers, idlers, pulleys, rail bearings and protection kits are sold directly from APER's shop." },
-];
 ---
 
-<Layout title="Support" description="Warranty, crash replacement, ordering and maintenance. Concept page." page="support">
-  <section class="section light">
-    <div class="wrap s-grid">
-      <div>
-        <h1>Support</h1>
-        <p class="lead">Warranty, ordering and service in one place.</p>
-        <a class="btn btn-solid" href={`${base}#contact`}>Contact APER</a>
-      </div>
-      <dl class="s-list">
-        {items.map((i) => (
-          <div>
-            <dt>{i.h}</dt>
-            <dd class="muted">{i.p}{i.verify && <span class="verify" title="To be confirmed by APER" />}</dd>
-          </div>
-        ))}
-      </dl>
+<Layout title="Support" description="Shipping, warranty, crash replacement, ordering and maintenance for APER bikes." page="support">
+  <section class="light sup-head">
+    <div class="wrap">
+      <h1>Support</h1>
+      <p class="lead muted">Answers from the people who designed and machined your bike.</p>
+      <nav class="jump" aria-label="Support topics">
+        <a href="#shipping">Shipping</a><a href="#ordering">Ordering</a><a href="#warranty">Warranty</a><a href="#crash">Crash replacement</a><a href="#returns">Returns</a><a href="#care">Care</a><a href="#contact-us">Contact</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="light sup">
+    <div class="wrap sup-grid">
+      <article id="shipping">
+        <h2>Shipping</h2>
+        <p>Every order ships from our workshop in Patras. Bikes and framesets ship free. For accessories we use simple flat rates:</p>
+        <table>
+          <thead><tr><th scope="col">Method</th><th scope="col">Greece</th><th scope="col">International</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Courier</th><td>€7</td><td>€12</td></tr>
+            <tr><th scope="row">Box NOW locker</th><td>€1</td><td>Not available</td></tr>
+            <tr><th scope="row">Bikes and framesets</th><td>Free</td><td>Free</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article id="ordering">
+        <h2>Ordering a DRYAD</h2>
+        <p>The DRYAD is on pre-order. A €400 deposit reserves your frame slot and locks the pre-order price. We confirm size and build with you before machining starts, and you pay the balance when your bike is finished. First deliveries are planned from December 2026.</p>
+        <p>The KOMPace is built to order in sizes S1 to S3, in black or in coloured anodising for €300 more.</p>
+      </article>
+
+      <article id="warranty">
+        <h2>Five-year warranty</h2>
+        <p>Every APER frame carries a manufacturer's warranty of five years from the date of purchase. It covers frames, swingarms, rails and every other frame part we manufacture, for the first owner of a bike or frameset bought from aper-bikes.com or an authorised reseller.</p>
+        <p>If a defect is covered, we repair it or replace the part with an equivalent one, which may differ in colour. Bicycle components from other brands are covered by their own manufacturers. The warranty does not cover normal wear, crash damage, incorrect assembly or maintenance, incompatible parts, cosmetic marks or rental use.</p>
+        <p>Inspect your bike when it arrives and let us know in writing about any visible defect straight away.</p>
+      </article>
+
+      <article id="crash">
+        <h2>Crash replacement</h2>
+        <p>A hard crash can damage a frame in ways that make it unsafe to ride. For five years after purchase, we replace a damaged APER frame component at 35% off its price at the time you ask. The colour may differ; the part is fully functional and safe.</p>
+      </article>
+
+      <article id="returns">
+        <h2>Returns and changes</h2>
+        <p>Bikes and framesets are machined for each order, so we can't take them back or exchange them for a different size, colour or model. Ask us anything before you order and we'll help you choose the right size and build.</p>
+      </article>
+
+      <article id="care">
+        <h2>Care and maintenance</h2>
+        <p>Clean the frame after riding. On the KOMPace, lubricate the Rising Pivot rail after every ride and every wash: a dry rail wears faster. For adjustments, visit a specialist workshop or ask us. Replacement parts are in the <a class="link" href={`${base}accessories/`}>accessories shop</a>.</p>
+      </article>
+
+      <article id="contact-us" class="contact-card">
+        <h2>Contact</h2>
+        <p><a class="link" href="mailto:info@aper-bikes.com">info@aper-bikes.com</a><br />+30 694 089 5867, weekdays 8:00–16:00 CET</p>
+        <p class="muted">APER Bikes<br />Panachaikou 96<br />26442 Patras, Greece</p>
+      </article>
     </div>
   </section>
 </Layout>
 
 <style>
-  .s-grid {
+  .sup-head {
+    padding-block: clamp(48px, 6vw, 88px) 24px;
+    text-align: center;
+  }
+  .sup-head h1 {
+    margin-bottom: 12px;
+  }
+  .sup-head .lead {
+    margin: 0 auto 28px;
+  }
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .jump a {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--paper-2);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color var(--t-ui) var(--ease-out);
+  }
+  .jump a:hover {
+    background: var(--paper-3);
+  }
+  .sup {
+    padding-block: 32px var(--section);
+  }
+  .sup-grid {
+    max-width: 820px;
     display: grid;
-    grid-template-columns: 5fr 7fr;
-    gap: clamp(32px, 6vw, 112px);
-    align-items: start;
+    gap: 14px;
   }
-  h1 {
-    margin-bottom: 16px;
+  .sup-grid article {
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: clamp(24px, 3vw, 36px);
   }
-  .lead {
-    margin-bottom: 28px;
+  .sup-grid h2 {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    margin-bottom: 14px;
   }
-  .s-list {
-    margin: 0;
-    border-top: 1px solid var(--line);
+  .sup-grid p:last-child {
+    margin-bottom: 0;
   }
-  .s-list > div {
-    border-bottom: 1px solid var(--line);
-    padding: 20px 0;
-  }
-  .s-list dt {
-    font-weight: 600;
-    font-size: var(--step-h3);
-    margin-bottom: 6px;
-  }
-  .s-list dd {
-    margin: 0;
-  }
-  @media (max-width: 860px) {
-    .s-grid {
-      grid-template-columns: 1fr;
-    }
+  table {
+    margin-top: 8px;
+    font-size: 0.9375rem;
   }
 </style>

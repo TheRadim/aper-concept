@@ -1,0 +1,330 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { accessories, anodised, type Accessory } from "../../data/accessories";
+export function getStaticPaths() {
+  return accessories.map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+const { a } = Astro.props as { a: Accessory };
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const eur = (n: number) => "€" + n.toLocaleString("en-GB");
+const hex = Object.fromEntries(anodised.map((c) => [c.name, c.hex]));
+const related = accessories.filter((x) => x.slug !== a.slug && (x.tags.some((t) => a.tags.includes(t)) || x.cat === a.cat)).slice(0, 4);
+const item = { slug: a.slug, name: a.name, price: a.price, img: a.img, href: `${base}accessories/${a.slug}/` };
+---
+
+<Layout title={a.name} description={`${a.name}. ${a.lead}`} page="accessories">
+  <section class="light apdp">
+    <div class="wrap">
+      <p class="crumb small"><a href={`${base}accessories/`}>Accessories</a> / {a.name}</p>
+      <div class="apdp-in">
+        <figure class="a-photo"><img src={a.img} alt={a.name} /></figure>
+        <form class="a-panel" data-acc-form={JSON.stringify(item)} onsubmit="return false">
+          <p class="small muted">{a.cat === "Apparel" ? "Apparel" : `Fits ${a.fits}`}</p>
+          <h1>{a.name}</h1>
+          <p class="a-price num">{eur(a.price)}</p>
+          <p class="a-lead">{a.lead}</p>
+
+          {a.options.map((o) => (
+            <fieldset class="a-opt" data-opt={o.name}>
+              <legend>{o.name}: <span data-chosen>{o.kind === "colour" ? o.values[0] : "Choose"}</span></legend>
+              <div class:list={["vals", o.kind]}>
+                {o.values.map((v, i) => (
+                  <label class="val" title={v}>
+                    <input type="radio" name={o.name} value={v} checked={o.kind === "colour" && i === 0} required />
+                    {o.kind === "colour" ? <span class="sw" style={`--c:${hex[v]}`}><span class="sr">{v}</span></span> : <span class="tx">{v}</span>}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+
+          <div class="buyrow">
+            <span class="qty big"><button type="button" data-q="-1" aria-label="Fewer">−</button><span data-qty>1</span><button type="button" data-q="1" aria-label="More">+</button></span>
+            <button type="submit" class="btn btn-solid add" data-add>Add to bag</button>
+          </div>
+          <p class="small muted hint" data-hint aria-live="polite"></p>
+          <ul class="perks small">
+            <li>Ships from Patras. Greece €7, Box NOW €1, international €12.</li>
+            <li>Free shipping when you order a bike or frameset.</li>
+          </ul>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="light alt a-more" aria-labelledby="ov-h">
+    <div class="wrap a-more-in">
+      <div>
+        <h2 id="ov-h">Overview</h2>
+        {a.body.map((p) => <p class="lead">{p}</p>)}
+      </div>
+      <div>
+        <h2>Details</h2>
+        <dl class="a-dl">{a.details.map(([k, v]) => (<div><dt>{k}</dt><dd>{v}</dd></div>))}</dl>
+      </div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section light" aria-labelledby="rel-h">
+      <div class="wrap">
+        <div class="head-row"><h2 id="rel-h">You may also need</h2><a class="link more" href={`${base}accessories/`}>All accessories</a></div>
+        <div class="rel">
+          {related.map((r) => (
+            <a class="card" href={`${base}accessories/${r.slug}/`}>
+              <figure class="r-photo"><img src={r.img} alt={r.name} loading="lazy" /></figure>
+              <div class="card-body"><h3>{r.name}</h3><p class="card-price num">{eur(r.price)}</p></div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  .apdp {
+    padding-block: 20px clamp(56px, 7vw, 96px);
+  }
+  .crumb {
+    color: var(--text-light-2);
+    margin-bottom: 20px;
+  }
+  .crumb a {
+    color: var(--link);
+    text-decoration: none;
+  }
+  .apdp-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr);
+    gap: clamp(32px, 5vw, 88px);
+    align-items: start;
+  }
+  .a-photo {
+    margin: 0;
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: sticky;
+    top: calc(var(--bar-h) + 24px);
+  }
+  .a-photo img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+  .a-panel h1 {
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 3rem);
+    margin: 6px 0 10px;
+  }
+  .a-price {
+    font-size: 1.375rem;
+    margin-bottom: 14px;
+  }
+  .a-lead {
+    color: var(--text-light-2);
+    margin-bottom: 26px;
+  }
+  .a-opt {
+    border: 0;
+    padding: 0;
+    margin: 0 0 22px;
+  }
+  .a-opt legend {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 10px;
+  }
+  .a-opt legend span {
+    font-weight: 400;
+    color: var(--text-light-2);
+  }
+  .vals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .val {
+    position: relative;
+    cursor: pointer;
+  }
+  .val input {
+    position: absolute;
+    opacity: 0;
+  }
+  .sw {
+    display: block;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.12),
+      0 0 0 3px #fff,
+      0 0 0 4px transparent;
+    transition: box-shadow var(--t-ui) var(--ease-out), transform var(--t-press) var(--ease-out);
+  }
+  .val:hover .sw {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12), 0 0 0 3px #fff, 0 0 0 4px var(--paper-3);
+  }
+  .val input:checked + .sw {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12), 0 0 0 3px #fff, 0 0 0 5px var(--link);
+  }
+  .val:active .sw {
+    transform: scale(0.94);
+  }
+  .tx {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--paper-3);
+    font-size: 0.9375rem;
+    transition: border-color var(--t-ui) var(--ease-out);
+  }
+  .val:hover .tx {
+    border-color: var(--text-light-2);
+  }
+  .val input:checked + .tx {
+    border-color: var(--link);
+    box-shadow: inset 0 0 0 1px var(--link);
+  }
+  .val input:focus-visible + .tx,
+  .val input:focus-visible + .sw {
+    outline: 2px solid var(--link);
+    outline-offset: 4px;
+  }
+  .buyrow {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .qty.big {
+    height: 50px;
+  }
+  .qty.big button {
+    width: 42px;
+    height: 48px;
+  }
+  .add {
+    flex: 1;
+    min-height: 50px;
+  }
+  .hint {
+    min-height: 1.4em;
+    margin: 10px 0 18px;
+  }
+  .perks {
+    list-style: none;
+    padding: 16px 0 0;
+    margin: 0;
+    border-top: 1px solid var(--line-light);
+    color: var(--text-light-2);
+  }
+  .perks li {
+    padding: 3px 0;
+  }
+  .a-more {
+    padding-block: clamp(56px, 7vw, 96px);
+  }
+  .a-more-in {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+  .a-more h2 {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    margin-bottom: 18px;
+  }
+  .a-dl {
+    margin: 0;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 6px 22px;
+  }
+  .a-dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line-light);
+    font-size: 0.9375rem;
+  }
+  .a-dl div:last-child {
+    border-bottom: 0;
+  }
+  .a-dl dt {
+    color: var(--text-light-2);
+  }
+  .a-dl dd {
+    margin: 0;
+    text-align: right;
+  }
+  .rel {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .r-photo {
+    margin: 10px 10px 0;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border-radius: var(--radius-s);
+    overflow: hidden;
+  }
+  .r-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  @media (max-width: 860px) {
+    .apdp-in,
+    .a-more-in {
+      grid-template-columns: 1fr;
+    }
+    .a-photo {
+      position: static;
+    }
+    .rel {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { add } from "../../scripts/cart";
+  document.querySelectorAll<HTMLFormElement>("[data-acc-form]").forEach((f) => {
+    const item = JSON.parse(f.dataset.accForm!) as { slug: string; name: string; price: number; img: string; href: string };
+    let qty = 1;
+    const qtyEl = f.querySelector<HTMLElement>("[data-qty]")!;
+    const hint = f.querySelector<HTMLElement>("[data-hint]")!;
+    f.querySelectorAll<HTMLButtonElement>("[data-q]").forEach((b) =>
+      b.addEventListener("click", () => {
+        qty = Math.max(1, Math.min(20, qty + Number(b.dataset.q)));
+        qtyEl.textContent = String(qty);
+      }),
+    );
+    f.addEventListener("change", (e) => {
+      const i = e.target as HTMLInputElement;
+      const fs = i.closest<HTMLElement>("[data-opt]");
+      if (fs) fs.querySelector("[data-chosen]")!.textContent = i.value;
+      hint.textContent = "";
+    });
+    f.addEventListener("submit", () => {
+      const sets = [...f.querySelectorAll<HTMLElement>("[data-opt]")];
+      const chosen = sets.map((s) => [s.dataset.opt!, s.querySelector<HTMLInputElement>("input:checked")?.value] as const);
+      const missing = chosen.find(([, v]) => !v);
+      if (missing) {
+        hint.textContent = `Choose a ${missing[0].toLowerCase()} first.`;
+        return;
+      }
+      const meta = chosen.map(([k, v]) => `${k}: ${v}`).join(" · ");
+      add({ key: `acc:${item.slug}:${meta}`, name: item.name, meta: meta || "Accessory", price: item.price, img: item.img, kind: "accessory", href: item.href }, qty);
+    });
+  });
+</script>

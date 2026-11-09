@@ -1,0 +1,320 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const countries = ["Denmark", "Greece", "Germany", "Austria", "Belgium", "Czech Republic", "Finland", "France", "Ireland", "Italy", "Netherlands", "Norway", "Poland", "Portugal", "Spain", "Sweden", "Switzerland", "United Kingdom"];
+---
+
+<Layout title="Checkout" description="APER checkout." page="checkout">
+  <section class="light co">
+    <div class="wrap co-in">
+      <form class="co-form" data-checkout novalidate>
+        <h1>Checkout</h1>
+        <p class="small proto">Prototype checkout: nothing you enter leaves this browser and no payment is taken.</p>
+
+        <fieldset>
+          <legend>Contact</legend>
+          <div class="row">
+            <label class="fl full"><input name="email" type="email" autocomplete="email" placeholder=" " required /><span>Email</span></label>
+            <label class="fl full"><input name="phone" type="tel" autocomplete="tel" placeholder=" " /><span>Phone, for the courier</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Delivery address</legend>
+          <div class="row">
+            <label class="fl"><input name="first" autocomplete="given-name" placeholder=" " required /><span>First name</span></label>
+            <label class="fl"><input name="last" autocomplete="family-name" placeholder=" " required /><span>Last name</span></label>
+            <label class="fl full"><input name="street" autocomplete="street-address" placeholder=" " required /><span>Street and number</span></label>
+            <label class="fl"><input name="zip" autocomplete="postal-code" placeholder=" " required /><span>Postcode</span></label>
+            <label class="fl"><input name="city" autocomplete="address-level2" placeholder=" " required /><span>City</span></label>
+            <label class="fl full sel"><select name="country" autocomplete="country-name" data-country>{countries.map((c) => <option>{c}</option>)}</select><span>Country</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Delivery</legend>
+          <div class="choices" data-ship></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Payment</legend>
+          <div class="choices">
+            <label class="ch"><input type="radio" name="pay" value="Card" checked /><span><strong>Card</strong><small>Visa, Mastercard, Amex. Paid on the secure payment page.</small></span></label>
+            <label class="ch"><input type="radio" name="pay" value="PayPal" /><span><strong>PayPal</strong><small>You continue on PayPal.</small></span></label>
+            <label class="ch"><input type="radio" name="pay" value="Bank transfer" /><span><strong>Bank transfer</strong><small>Details sent by email. Your order is confirmed when payment arrives.</small></span></label>
+          </div>
+        </fieldset>
+
+        <label class="agree small"><input type="checkbox" name="terms" required /> I agree to the terms of sale and understand that built-to-order bikes and framesets cannot be returned.</label>
+        <p class="small err" data-err aria-live="polite"></p>
+        <button class="btn btn-solid place" type="submit">Place order</button>
+      </form>
+
+      <aside class="co-sum">
+        <h2>Order summary</h2>
+        <div data-co-lines></div>
+        <div class="totals" data-co-totals></div>
+        <a class="link small" href={`${base}cart/`}>Edit bag</a>
+      </aside>
+
+      <div class="done" data-done hidden>
+        <h1>Thank you.</h1>
+        <p class="lead">Your order summary is below. In this prototype no order was sent to APER and nothing was charged.</p>
+        <div data-done-sum></div>
+        <a class="btn btn-solid" href={base}>Back to the shop</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .co {
+    padding-block: clamp(32px, 5vw, 64px) var(--section);
+  }
+  .co-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  h1 {
+    font-size: clamp(2rem, 1.5rem + 1.8vw, 3rem);
+    margin-bottom: 8px;
+  }
+  .proto {
+    color: var(--text-light-2);
+    margin-bottom: 24px;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0 0 28px;
+  }
+  legend {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .full {
+    grid-column: 1 / -1;
+  }
+  /* Floating labels */
+  .fl {
+    position: relative;
+    display: block;
+  }
+  .fl input,
+  .fl select {
+    width: 100%;
+    height: 56px;
+    padding: 22px 14px 6px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius-s);
+    background: #fff;
+    font-size: 1.0625rem;
+    transition: border-color var(--t-ui) var(--ease-out), box-shadow var(--t-ui) var(--ease-out);
+    appearance: none;
+  }
+  .fl input:focus,
+  .fl select:focus {
+    outline: none;
+    border-color: var(--link);
+    box-shadow: 0 0 0 3px rgb(0 102 204 / 0.2);
+  }
+  .fl span {
+    position: absolute;
+    left: 15px;
+    top: 18px;
+    color: var(--text-light-2);
+    font-size: 1.0625rem;
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform 180ms var(--ease-out);
+  }
+  .fl input:focus + span,
+  .fl input:not(:placeholder-shown) + span,
+  .fl.sel span {
+    transform: translateY(-10px) scale(0.72);
+  }
+  .fl input[aria-invalid="true"] {
+    border-color: #e30000;
+  }
+  .choices {
+    display: grid;
+    gap: 8px;
+  }
+  :global(.ch) {
+    position: relative;
+    cursor: pointer;
+  }
+  :global(.ch input) {
+    position: absolute;
+    opacity: 0;
+  }
+  :global(.ch > span) {
+    display: grid;
+    gap: 2px;
+    padding: 14px 16px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius-s);
+    transition: border-color var(--t-ui) var(--ease-out);
+  }
+  :global(.ch > span strong) {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+  }
+  :global(.ch small) {
+    color: var(--text-light-2);
+    font-size: 0.8125rem;
+  }
+  :global(.ch input:checked + span) {
+    border-color: var(--link);
+    box-shadow: inset 0 0 0 1px var(--link);
+  }
+  :global(.ch input:focus-visible + span) {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+  }
+  .agree {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    color: var(--text-light-2);
+  }
+  .err {
+    color: #e30000;
+    min-height: 1.4em;
+  }
+  .place {
+    width: 100%;
+    min-height: 52px;
+  }
+  .co-sum {
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: 24px 24px 20px;
+    position: sticky;
+    top: calc(var(--bar-h) + 24px);
+  }
+  .co-sum h2 {
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+  }
+  .co-sum :global(.line) {
+    grid-template-columns: 56px 1fr auto;
+  }
+  .co-sum :global(.line img) {
+    width: 56px;
+    height: 56px;
+  }
+  .co-sum :global(.qty),
+  .co-sum :global(.remove) {
+    display: none;
+  }
+  .totals {
+    display: grid;
+    gap: 8px;
+    margin: 14px 0 12px;
+  }
+  .done {
+    grid-column: 1 / -1;
+    max-width: 640px;
+  }
+  .done :global(.line .qty),
+  .done :global(.line .remove) {
+    display: none;
+  }
+  @media (max-width: 860px) {
+    .co-in {
+      grid-template-columns: 1fr;
+    }
+    .co-sum {
+      position: static;
+      order: -1;
+    }
+    .row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { read, lineHTML, totals, clear } from "../scripts/cart";
+  const eur = (n: number) => "€" + n.toLocaleString("en-GB");
+  const form = document.querySelector<HTMLFormElement>("[data-checkout]")!;
+  const shipBox = form.querySelector<HTMLElement>("[data-ship]")!;
+  const country = form.querySelector<HTMLSelectElement>("[data-country]")!;
+  const linesBox = document.querySelector<HTMLElement>("[data-co-lines]")!;
+  const totBox = document.querySelector<HTMLElement>("[data-co-totals]")!;
+  // Rates from aper-bikes.com/shipping: Greece courier €7, Box NOW €1, international €12; bikes and framesets ship free.
+  const shipOptions = () => {
+    const t = totals();
+    if (t.hasBike) return [{ id: "free", label: "Courier, insured", note: "Free for bikes and framesets", price: 0 }];
+    if (country.value === "Greece")
+      return [
+        { id: "courier", label: "Courier", note: "2–4 working days", price: 7 },
+        { id: "boxnow", label: "Box NOW locker", note: "Pick up from a locker near you", price: 1 },
+      ];
+    return [{ id: "intl", label: "International courier", note: "Shipped from Patras", price: 12 }];
+  };
+  const shipping = () => {
+    const opts = shipOptions();
+    const v = form.querySelector<HTMLInputElement>('input[name="ship"]:checked')?.value;
+    return opts.find((o) => o.id === v) ?? opts[0];
+  };
+  const renderShip = () => {
+    const opts = shipOptions();
+    const cur = shipping().id;
+    shipBox.innerHTML = opts
+      .map((o) => `<label class="ch"><input type="radio" name="ship" value="${o.id}" ${o.id === cur ? "checked" : ""}/><span><strong>${o.label}<em>${o.price ? eur(o.price) : "Free"}</em></strong><small>${o.note}</small></span></label>`)
+      .join("");
+  };
+  const renderSum = () => {
+    const ls = read();
+    const t = totals(ls);
+    const s = shipping();
+    linesBox.innerHTML = ls.length ? ls.map(lineHTML).join("") : `<p class="empty">Your bag is empty.</p>`;
+    totBox.innerHTML = `
+      <div><span>Subtotal</span><span>${eur(t.subtotal)}</span></div>
+      <div><span>Shipping</span><span>${s.price ? eur(s.price) : "Free"}</span></div>
+      ${t.later ? `<div><span>Due later</span><span>${eur(t.later)}</span></div>` : ""}
+      <div class="grand"><span>Due today</span><span>${eur(t.due + s.price)}</span></div>`;
+    form.querySelector<HTMLButtonElement>(".place")!.disabled = !ls.length;
+  };
+  country.value = "Denmark";
+  country.addEventListener("change", () => (renderShip(), renderSum()));
+  shipBox.addEventListener("change", renderSum);
+  document.addEventListener("bag:change", () => (renderShip(), renderSum()));
+  renderShip();
+  renderSum();
+
+  // Inline validation: mark fields on blur, not before.
+  form.querySelectorAll<HTMLInputElement>("input[required]").forEach((i) =>
+    i.addEventListener("blur", () => i.type !== "checkbox" && i.setAttribute("aria-invalid", String(!i.checkValidity()))),
+  );
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const bad = [...form.querySelectorAll<HTMLInputElement>("input[required]")].filter((i) => !i.checkValidity());
+    bad.forEach((i) => i.type !== "checkbox" && i.setAttribute("aria-invalid", "true"));
+    const err = form.querySelector<HTMLElement>("[data-err]")!;
+    if (bad.length) {
+      err.textContent = bad.some((i) => i.type === "checkbox") && bad.length === 1 ? "Please accept the terms of sale." : "Please complete the highlighted fields.";
+      bad[0].focus();
+      return;
+    }
+    const sum = linesBox.innerHTML + `<div class="totals">${totBox.innerHTML}</div>`;
+    form.hidden = true;
+    document.querySelector<HTMLElement>(".co-sum")!.hidden = true;
+    const done = document.querySelector<HTMLElement>("[data-done]")!;
+    done.querySelector("[data-done-sum]")!.innerHTML = sum;
+    done.hidden = false;
+    clear();
+    scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>

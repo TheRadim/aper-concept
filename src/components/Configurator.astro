@@ -33,6 +33,8 @@ const steps: Step[] = isDryad
 
 const cfg = {
   isDryad,
+  base,
+  img: photos[isDryad ? "dryadWorkshop" : "kompaceStudio"].src,
   deposit,
   steps: steps.map((s) => ({ id: s.id, skipIf: s.skipIf ?? null, labels: Object.fromEntries(s.options.map((o) => [o.value, o.label])) })),
   builds: Object.fromEntries(bike.builds.map((x) => [x.id, { name: x.name, price: x.price, was: x.was ?? null, shop: x.shop, wheels: x.bullets[1] }])),
@@ -98,8 +100,9 @@ const gallery: [PhotoKey, string][] = isDryad
             <div class="step-head static"><span class="step-title">Your {bike.name}</span></div>
             <div class="step-body"><div class="step-inner">
               <dl class="sum" data-sum></dl>
-              <a class="btn btn-solid cta" data-go href="#">{isDryad ? `Reserve with ${eur(deposit)} deposit` : "Buy on aper-bikes.com"}</a>
+              <button type="button" class="btn btn-solid cta" data-go>Add to bag</button>
               {isDryad && <p class="small muted" data-split></p>}
+              {!isDryad && <p class="small muted">Free shipping. Built to order and shipped from Patras.</p>}
               <p class="small muted">5-year frame warranty · Crash replacement · Built to order in Patras</p>
             </div></div>
           </li>
@@ -137,6 +140,8 @@ const gallery: [PhotoKey, string][] = isDryad
   .gal-main {
     background: var(--paper-2);
     aspect-ratio: 3 / 2;
+    border-radius: var(--radius);
+    overflow: hidden;
   }
   .gal-main img {
     width: 100%;
@@ -161,6 +166,8 @@ const gallery: [PhotoKey, string][] = isDryad
     aspect-ratio: 4 / 3;
     background: var(--paper-2);
     position: relative;
+    border-radius: 10px;
+    overflow: hidden;
   }
   .gal-thumbs img {
     width: 100%;
@@ -177,7 +184,8 @@ const gallery: [PhotoKey, string][] = isDryad
     content: "";
     position: absolute;
     inset: 0;
-    box-shadow: inset 0 0 0 1.5px var(--ink);
+    box-shadow: inset 0 0 0 2px var(--ink);
+    border-radius: 10px;
   }
 
   .kicker {
@@ -185,7 +193,7 @@ const gallery: [PhotoKey, string][] = isDryad
   }
   .cfg h1 {
     font-size: clamp(2.5rem, 1.6rem + 2.6vw, 3.75rem);
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.035em;
     margin-bottom: 12px;
   }
@@ -331,9 +339,9 @@ const gallery: [PhotoKey, string][] = isDryad
     grid-template-columns: 1fr auto;
     gap: 2px 12px;
     padding: 14px 16px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    transition: border-color var(--t-ui) var(--ease-out), background-color var(--t-ui) var(--ease-out);
+    border: 1px solid var(--paper-3);
+    border-radius: var(--radius-s);
+    transition: border-color var(--t-ui) var(--ease-out), background-color var(--t-ui) var(--ease-out), transform var(--t-press) var(--ease-out);
   }
   .opt:hover .opt-box {
     border-color: var(--ink);
@@ -447,8 +455,11 @@ const gallery: [PhotoKey, string][] = isDryad
     );
   });
 
+  import { add } from "../scripts/cart";
   type Cfg = {
     isDryad: boolean;
+    base: string;
+    img: string;
     deposit: number;
     steps: { id: string; skipIf: [string, string] | null; labels: Record<string, string> }[];
     builds: Record<string, { name: string; price: number; was: number | null; shop: string; wheels: string }>;
@@ -500,8 +511,6 @@ const gallery: [PhotoKey, string][] = isDryad
         form.querySelector("[data-sum]")!.innerHTML =
           rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("") +
           `<div class="total"><dt>Total</dt><dd>${eur(t.price)}</dd></div>`;
-        const go = form.querySelector<HTMLAnchorElement>("[data-go]")!;
-        go.href = cfg.isDryad ? `${t.b.shop}?build=${buildId()}&size=${pick.size}` : t.b.shop;
         const split = form.querySelector("[data-split]");
         if (split) split.textContent = `${eur(cfg.deposit)} today, ${eur(t.price - cfg.deposit)} when your bike is finished.`;
       }
@@ -530,6 +539,23 @@ const gallery: [PhotoKey, string][] = isDryad
         else if (st === "open" && pick[id]) render(null);
       }),
     );
+
+    form.querySelector("[data-go]")!.addEventListener("click", () => {
+      const t = total();
+      if (!t) return;
+      const id = buildId()!;
+      const colour = cfg.isDryad ? "Gold" : cfg.steps[1].labels[pick.colour];
+      add({
+        key: `${cfg.isDryad ? "dryad" : "kompace"}:${id}:${pick.size}:${colour}`,
+        name: t.b.name,
+        meta: `Size ${pick.size} · ${colour}${cfg.isDryad ? " · Pre-order" : ""}`,
+        price: t.price,
+        due: cfg.isDryad ? cfg.deposit : undefined,
+        img: cfg.img,
+        kind: id === "frameset" ? "frameset" : "bike",
+        href: `${cfg.base}${cfg.isDryad ? "dryad" : "kompace"}/`,
+      });
+    });
 
     render(cfg.steps[0].id);
   });

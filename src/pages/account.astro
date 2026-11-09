@@ -1,0 +1,120 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const areas = [
+  { id: "orders", h: "Orders", p: "Track deliveries, see your pre-order status and download invoices.", empty: "You have no orders yet." },
+  { id: "bikes", h: "My bikes and warranty", p: "Register your frame number to activate the five-year frame warranty and keep service history in one place.", empty: "No bikes registered yet." },
+  { id: "addresses", h: "Addresses", p: "Save delivery and billing addresses for faster checkout.", empty: "No saved addresses." },
+  { id: "details", h: "Account details", p: "Name, email, phone and newsletter preferences.", empty: "Sign in to edit your details." },
+  { id: "crash", h: "Crash replacement", p: "Damaged a frame in a crash? Request a replacement part at 35% off within five years of purchase.", empty: "No open requests." },
+  { id: "returns", h: "Support requests", p: "Questions about fit, parts or service, answered by the people who built your bike.", empty: "No open requests." },
+];
+---
+
+<Layout title="Your account" description="Manage orders, addresses and your APER bikes." page="account">
+  <section class="light acc">
+    <div class="wrap">
+      <div class="signin">
+        <h1>Your APER account</h1>
+        <p class="lead muted">Sign in with your email. We'll send you a one-time link, no password needed.</p>
+        <form class="si" data-signin novalidate>
+          <label class="sr" for="si-email">Email</label>
+          <input id="si-email" type="email" autocomplete="email" placeholder="Email address" required />
+          <button class="btn btn-solid" type="submit">Continue</button>
+        </form>
+        <p class="small muted" data-si-note aria-live="polite"></p>
+      </div>
+      <div class="areas">
+        {areas.map((a) => (
+          <article class="area" id={a.id}>
+            <h2>{a.h}</h2>
+            <p class="muted">{a.p}</p>
+            <p class="small empty-state">{a.empty}</p>
+          </article>
+        ))}
+      </div>
+      <p class="small muted help">Need something now? Call +30 694 089 5867 on weekdays 8:00–16:00 CET, or see <a class="link" href={`${base}support/`}>Support</a>.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .acc {
+    padding-block: clamp(48px, 6vw, 96px) var(--section);
+  }
+  .signin {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto 64px;
+  }
+  .signin h1 {
+    font-size: clamp(2.25rem, 1.6rem + 2vw, 3.5rem);
+    margin-bottom: 12px;
+  }
+  .signin .lead {
+    margin: 0 auto 24px;
+  }
+  .si {
+    display: flex;
+    gap: 10px;
+  }
+  .si input {
+    flex: 1;
+    height: 50px;
+    padding: 0 16px;
+    border: 1px solid #d2d2d7;
+    border-radius: var(--radius-s);
+    font-size: 1.0625rem;
+  }
+  .si input:focus {
+    outline: none;
+    border-color: var(--link);
+    box-shadow: 0 0 0 3px rgb(0 102 204 / 0.2);
+  }
+  .si .btn {
+    min-height: 50px;
+  }
+  .areas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .area {
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .area h2 {
+    font-size: 1.375rem;
+    margin-bottom: 8px;
+  }
+  .empty-state {
+    margin: auto 0 0;
+    padding-top: 16px;
+    color: var(--text-light-2);
+  }
+  .help {
+    text-align: center;
+    margin: 40px auto 0;
+  }
+  @media (max-width: 860px) {
+    .areas {
+      grid-template-columns: 1fr;
+    }
+    .si {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  const f = document.querySelector<HTMLFormElement>("[data-signin]")!;
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const i = f.querySelector("input")!;
+    const note = document.querySelector<HTMLElement>("[data-si-note]")!;
+    note.textContent = i.checkValidity() ? "Sign-in isn't connected in this prototype, so no email is sent." : "Enter a valid email address.";
+  });
+</script>

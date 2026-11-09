@@ -59,3 +59,24 @@ const io = new IntersectionObserver(
   { rootMargin: "0px 0px -12% 0px" },
 );
 document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+
+// Account popover: opens from its trigger, closes on outside click and Escape.
+const acctBtn = document.querySelector<HTMLButtonElement>("[data-acct-btn]");
+const acct = document.getElementById("acct");
+const setAcct = (open: boolean) => {
+  acct?.setAttribute("data-open", String(open));
+  acctBtn?.setAttribute("aria-expanded", String(open));
+};
+acctBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setAcct(acct?.getAttribute("data-open") !== "true");
+});
+document.addEventListener("click", (e) => {
+  if (acct && !acct.contains(e.target as Node)) setAcct(false);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && acct?.getAttribute("data-open") === "true") {
+    setAcct(false);
+    acctBtn?.focus();
+  }
+});

@@ -1,107 +1,144 @@
 ---
-import "@fontsource-variable/archivo/wdth.css";
 import "../styles/global.css";
 import { logo } from "../data/media";
 interface Props {
   title: string;
   description: string;
-  page: "home" | "dryad" | "engineering" | "kompace" | "support" | "accessories";
+  page: "home" | "dryad" | "engineering" | "kompace" | "support" | "accessories" | "cart" | "checkout" | "account";
 }
 const { title, description, page } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const links: [string, string, Props["page"] | null, string?][] = [
+const links: [string, string, Props["page"] | null][] = [
   ["DRYAD", "dryad/", "dryad"],
   ["KOMPace", "kompace/", "kompace"],
   ["Accessories", "accessories/", "accessories"],
-  ["Engineering", "engineering/", "engineering", "nav-quiet"],
-  ["About", "#about", null, "nav-quiet"],
+  ["Engineering", "engineering/", "engineering"],
+  ["About", "#about", null],
+  ["Support", "support/", "support"],
 ];
+const ig = "https://www.instagram.com/aperbikes/";
+const fb = "https://www.facebook.com/people/Aper-Bikes/100090624421301/";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-base={base}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>document.documentElement.classList.add("js");</script>
-    <title>{title} · APER concept</title>
+    <title>{title} · APER Bikes</title>
     <meta name="description" content={description} />
     <meta name="robots" content="noindex,nofollow" />
-    <meta name="theme-color" content="#141516" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
   </head>
   <body>
     <a class="sr" href="#main">Skip to content</a>
-    <div class="concept">
-      <div class="wrap concept-in">
-        <p>Design concept by Radim Theiner. Not the official APER website.</p>
-        <nav aria-label="Service">
-          <a href={`${base}support/`}>Warranty & support</a>
-          <a href={`${base}dryad/#size`}>Find your size</a>
-          <a href={`${base}#contact`}>Contact</a>
-        </nav>
-      </div>
-    </div>
+    <div class="promo"><p>Free shipping on all bikes and framesets. <a href={`${base}dryad/`}>Pre-order the DRYAD ›</a></p></div>
     <header class="bar" data-bar>
       <div class="wrap bar-in">
-        <a class="mark" href={base} aria-label="APER Bikes, home"><img src={logo} alt="APER Bikes" width="50" height="46" /></a>
+        <a class="mark" href={base} aria-label="APER Bikes, home">
+          <span class="boar" aria-hidden="true"><img src={logo} alt="" width="69" height="64" /></span>
+          <span class="wordmark">APER</span>
+        </a>
         <nav class="nav" id="nav" aria-label="Main">
-          {
-            links.map(([label, href, key, cls]) => (
-              <a class={cls} href={base + href} aria-current={key === page ? "page" : undefined}>
-                {label}
-              </a>
-            ))
-          }
+          {links.map(([label, href, key]) => <a href={base + href} aria-current={key === page ? "page" : undefined}>{label}</a>)}
         </nav>
         <div class="bar-end">
-          <a class="btn btn-sm" style="background:#141516;color:#fff" href={`${base}dryad/#buy`}>Reserve a DRYAD</a>
-          <button class="menu-btn" aria-expanded="false" aria-controls="nav" data-menu><span></span><span class="sr">Menu</span></button>
+          <a class="icon-btn" href={ig} aria-label="APER on Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+          </a>
+          <div class="pop-wrap">
+            <button class="icon-btn" aria-label="Account" aria-expanded="false" aria-controls="acct" data-acct-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8.5" r="3.8"></circle><path d="M4.5 20c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4" stroke-linecap="round"></path></svg>
+            </button>
+            <div class="pop" id="acct" data-open="false" role="menu">
+              <p>Sign in to track orders and register your frame.</p>
+              <a href={`${base}account/`} role="menuitem"><strong>Sign in</strong></a>
+              <hr />
+              <a href={`${base}account/#orders`} role="menuitem">Orders</a>
+              <a href={`${base}account/#addresses`} role="menuitem">Addresses</a>
+              <a href={`${base}account/#bikes`} role="menuitem">My bikes and warranty</a>
+              <a href={`${base}account/#details`} role="menuitem">Account details</a>
+              <hr />
+              <a href={`${base}support/`} role="menuitem">Help and support</a>
+            </div>
+          </div>
+          <button class="icon-btn" aria-label="Cart" data-cart-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3z"></path><path d="M9 8V6.5a3 3 0 0 1 6 0V8" stroke-linecap="round"></path></svg>
+            <span class="badge" data-cart-count hidden>0</span>
+          </button>
+          <button class="icon-btn menu-btn" aria-expanded="false" aria-controls="nav" data-menu><span></span><span class="sr">Menu</span></button>
         </div>
       </div>
     </header>
+
     <main id="main">
       <slot />
     </main>
-    <footer class="foot dark">
+
+    <div class="scrim" data-scrim data-open="false"></div>
+    <aside class="sheet" data-sheet data-open="false" aria-label="Cart" aria-hidden="true">
+      <div class="sheet-head">
+        <h2>Your bag</h2>
+        <button class="icon-btn" aria-label="Close cart" data-cart-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="sheet-body" data-cart-lines></div>
+      <div class="sheet-foot">
+        <div class="totals" data-cart-totals></div>
+        <a class="btn btn-solid" href={`${base}checkout/`} data-cart-checkout>Check out</a>
+        <a class="btn btn-line" href={`${base}cart/`}>View bag</a>
+      </div>
+    </aside>
+
+    <footer class="foot">
       <div class="wrap">
         <div class="foot-top">
           <div>
-            <a class="mark foot-logo" href={base}><img src={logo} alt="APER Bikes" width="60" height="56" /></a>
-            <p class="small muted">Bicycles designed, programmed, machined and assembled in Patras, Greece.</p>
+            <a class="brand" href={base}><span class="boar" aria-hidden="true"><img src={logo} alt="" width="69" height="64" /></span><span class="wordmark">APER</span></a>
+            <p>Bicycles designed, programmed, machined and assembled in Patras, Greece.</p>
+            <p>Panachaikou 96, 26442 Patras, Greece<br />+30 694 089 5867 · weekdays 8:00–16:00 CET</p>
+            <div class="socials">
+              <a href={ig}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>@aperbikes</a>
+              <a href={fb}><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21z"></path></svg>Facebook</a>
+            </div>
           </div>
           <div>
-            <h2>Bikes</h2>
+            <h2>Shop</h2>
             <ul>
               <li><a href={`${base}dryad/`}>DRYAD</a></li>
               <li><a href={`${base}kompace/`}>KOMPace</a></li>
-              <li><a href={`${base}accessories/`}>Accessories & spares</a></li>
+              <li><a href={`${base}accessories/`}>Accessories and spares</a></li>
+              <li><a href={`${base}cart/`}>Your bag</a></li>
             </ul>
           </div>
           <div>
             <h2>Company</h2>
             <ul>
               <li><a href={`${base}engineering/`}>Engineering</a></li>
-              <li><a href={`${base}#about`}>About</a></li>
+              <li><a href={`${base}#about`}>About APER</a></li>
               <li><a href={`${base}#contact`}>Contact</a></li>
             </ul>
           </div>
           <div>
             <h2>Help</h2>
             <ul>
-              <li><a href={`${base}support/`}>Warranty</a></li>
-              <li><a href={`${base}support/`}>Ordering</a></li>
-              <li><a href="https://www.instagram.com/aperbikes/">Instagram</a></li>
+              <li><a href={`${base}support/#shipping`}>Shipping</a></li>
+              <li><a href={`${base}support/#warranty`}>Warranty</a></li>
+              <li><a href={`${base}support/#crash`}>Crash replacement</a></li>
+              <li><a href={`${base}account/`}>Your account</a></li>
             </ul>
           </div>
         </div>
         <div class="foot-last">
-          <p>Concept by Radim Theiner, Copenhagen, November 2026. Prices and specifications from aper-bikes.com, 8 Nov 2026. Gold dots mark details awaiting confirmation. Photos © APER Bikes (KOMPace MY2026: Adam Gasson / Bespoked), from aper-bikes.com, used for this concept preview.</p>
+          <p>© 2026 APER Bikes. Prices include VAT.</p>
+          <p>Website concept by Radim Theiner. Prototype only: no orders or payments are processed. Photos © APER Bikes; KOMPace MY2026 by Adam Gasson / Bespoked.</p>
         </div>
       </div>
     </footer>
     <script>
       import "../scripts/site.ts";
+      import "../scripts/cart.ts";
     </script>
   </body>
 </html>

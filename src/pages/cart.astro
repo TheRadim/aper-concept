@@ -1,0 +1,92 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<Layout title="Your bag" description="Your APER bag." page="cart">
+  <section class="light bag">
+    <div class="wrap bag-in">
+      <div>
+        <h1>Your bag</h1>
+        <div data-bag-lines></div>
+        <a class="link more" href={`${base}accessories/`}>Continue shopping</a>
+      </div>
+      <aside class="summary" data-bag-summary>
+        <h2>Summary</h2>
+        <div class="totals" data-bag-totals></div>
+        <a class="btn btn-solid" href={`${base}checkout/`} data-bag-checkout>Check out</a>
+        <ul class="small muted notes">
+          <li>DRYAD pre-orders: €400 deposit today, the balance when your bike is finished.</li>
+          <li>Bikes and framesets are built to order and cannot be returned. Questions first? <a class="link" href={`${base}#contact`}>Ask us</a>.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .bag {
+    padding-block: clamp(40px, 6vw, 80px) var(--section);
+  }
+  .bag-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  h1 {
+    font-size: clamp(2.25rem, 1.6rem + 2vw, 3.5rem);
+    margin-bottom: 20px;
+  }
+  [data-bag-lines] {
+    margin-bottom: 24px;
+    border-top: 1px solid var(--line-light);
+  }
+  .summary {
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: grid;
+    gap: 12px;
+    position: sticky;
+    top: calc(var(--bar-h) + 24px);
+  }
+  .summary h2 {
+    font-size: 1.375rem;
+  }
+  .totals {
+    display: grid;
+    gap: 8px;
+  }
+  .notes {
+    padding-left: 18px;
+    margin: 8px 0 0;
+  }
+  .notes li {
+    margin-bottom: 6px;
+  }
+  @media (max-width: 860px) {
+    .bag-in {
+      grid-template-columns: 1fr;
+    }
+    .summary {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  import { read, lineHTML, totalsHTML, bindLines } from "../scripts/cart";
+  const lines = document.querySelector<HTMLElement>("[data-bag-lines]")!;
+  const tot = document.querySelector<HTMLElement>("[data-bag-totals]")!;
+  const co = document.querySelector<HTMLElement>("[data-bag-checkout]")!;
+  const render = () => {
+    const ls = read();
+    lines.innerHTML = ls.length ? ls.map(lineHTML).join("") : `<p class="empty">Your bag is empty.</p>`;
+    tot.innerHTML = ls.length ? totalsHTML() : `<p class="small muted">Add a bike or an accessory to get started.</p>`;
+    co.toggleAttribute("hidden", !ls.length);
+  };
+  bindLines(lines);
+  document.addEventListener("bag:change", render);
+  render();
+</script>
