@@ -39,37 +39,57 @@ const cfg = {
   steps: steps.map((s) => ({ id: s.id, skipIf: s.skipIf ?? null, labels: Object.fromEntries(s.options.map((o) => [o.value, o.label])) })),
   builds: Object.fromEntries(bike.builds.map((x) => [x.id, { name: x.name, price: x.price, was: x.was ?? null, shop: x.shop, wheels: x.bullets[1] }])),
 };
-const gallery: [PhotoKey, string][] = isDryad
-  ? [["dryadWorkshop", "50% 70%"], ["dryadOnMill", "50% 60%"], ["dryadWorkshop", "50% 28%"], ["ribDetail", "50% 50%"]]
-  : [["kompaceStudio", "50% 55%"], ["kompaceBespoked", "50% 55%"], ["kompaceForest", "50% 60%"], ["kompaceDrivetrain", "50% 50%"]];
+// [photo, object-position, fit]. Studio shots on white are shown whole; the rest fill the frame.
+const gallery: [PhotoKey, string, "cover" | "contain"][] = isDryad
+  ? [["dryadWorkshop", "50% 74%", "cover"], ["dryadOnMill", "50% 60%", "cover"], ["dryadWorkshop", "50% 26%", "cover"], ["ribDetail", "50% 50%", "cover"]]
+  : [["kompaceStudio", "50% 50%", "contain"], ["kompaceBespoked", "50% 55%", "cover"], ["kompaceForest", "50% 60%", "cover"], ["kompaceDrivetrain", "50% 50%", "cover"]];
+const intro = isDryad
+  ? "Choose a complete bike or the frameset, pick your groupset and size. Every DRYAD is built to order in Patras."
+  : "Choose the frameset, the complete bike or the MY2026 Special Edition, then colour and size. Built to order in Patras.";
 ---
 
 <section class="pdp light" id="buy" aria-labelledby="pdp-h">
   <div class="wrap">
     <p class="crumb small"><a href={base}>Home</a> / {bike.name}</p>
-    <div class="pdp-in">
-      <div class="gal" data-gallery>
-        <div class="gal-main">
-          {gallery.map(([k, pos], i) => (
-            <img src={photos[k].src} width={photos[k].width} height={photos[k].height} alt={`${bike.name}, image ${i + 1}`} style={`object-position:${pos}`} data-slide={i} hidden={i !== 0} loading={i === 0 ? "eager" : "lazy"} />
-          ))}
-        </div>
-        <div class="gal-thumbs" role="group" aria-label="Choose image">
-          {gallery.map(([k, pos], i) => (
-            <button type="button" data-thumb={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={`Image ${i + 1}`}>
-              <img src={photos[k].src} alt="" style={`object-position:${pos}`} loading="lazy" />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <form class="cfg" data-cfg={JSON.stringify(cfg)} onsubmit="return false">
+    <header class="pdp-head">
+      <div>
         <p class="kicker small muted">{bike.chips.map(([, v]) => v).slice(0, 3).join(" · ")}</p>
         <h1 id="pdp-h">{bike.name}</h1>
         <p class="tag">{bike.tagline}</p>
+      </div>
+      <div class="ph-right">
         <p class="price num" data-price>From {eur(bike.from)}</p>
         <p class="small avail"><span class="dot" aria-hidden="true"></span>{isDryad ? `Pre-order · first deliveries from ${facts.delivery}` : "Available · built to order in Patras"}</p>
+      </div>
+    </header>
 
+    <div class="gal" data-gallery>
+      <div class="gal-main">
+        {gallery.map(([k, pos, fit], i) => (
+          <img class={fit} src={photos[k].src} width={photos[k].width} height={photos[k].height} alt={`${bike.name}, image ${i + 1}`} style={`object-position:${pos}`} data-slide={i} hidden={i !== 0} loading={i === 0 ? "eager" : "lazy"} />
+        ))}
+      </div>
+      <div class="gal-thumbs" role="group" aria-label="Choose image">
+        {gallery.map(([k, pos, fit], i) => (
+          <button type="button" data-thumb={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={`Image ${i + 1}`}>
+            <img class={fit} src={photos[k].src} alt="" style={`object-position:${pos}`} loading="lazy" />
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="buy-grid">
+      <div class="buy-intro">
+        <h2>Configure your {bike.name}</h2>
+        <p class="muted">{intro}</p>
+        <ul class="trust small">
+          <li>5-year frame warranty</li>
+          <li>Crash replacement at 35% off</li>
+          <li>Free shipping on bikes and framesets</li>
+        </ul>
+      </div>
+
+      <form class="cfg" data-cfg={JSON.stringify(cfg)} onsubmit="return false">
         <ol class="steps">
           {steps.map((s, i) => (
             <li class="step" data-step={s.id} data-state={i === 0 ? "open" : "closed"}>
@@ -103,7 +123,6 @@ const gallery: [PhotoKey, string][] = isDryad
               <button type="button" class="btn btn-solid cta" data-go>Add to bag</button>
               {isDryad && <p class="small muted" data-split></p>}
               {!isDryad && <p class="small muted">Free shipping. Built to order and shipped from Patras.</p>}
-              <p class="small muted">5-year frame warranty · Crash replacement · Built to order in Patras</p>
             </div></div>
           </li>
         </ol>
@@ -114,11 +133,11 @@ const gallery: [PhotoKey, string][] = isDryad
 
 <style>
   .pdp {
-    padding-block: 20px clamp(64px, 7vw, 112px);
+    padding-block: clamp(32px, 5vw, 64px) clamp(72px, 8vw, 128px);
   }
   .crumb {
     color: var(--muted);
-    margin-bottom: 20px;
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
   .crumb a {
     color: inherit;
@@ -127,19 +146,62 @@ const gallery: [PhotoKey, string][] = isDryad
   .crumb a:hover {
     color: var(--ink);
   }
-  .pdp-in {
-    display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(340px, 1fr);
-    gap: clamp(32px, 5vw, 88px);
-    align-items: start;
+  .pdp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px 48px;
+    flex-wrap: wrap;
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
-  .gal {
-    position: sticky;
-    top: calc(var(--bar-h) + 24px);
+  .kicker {
+    margin-bottom: 8px;
+  }
+  .pdp-head h1 {
+    font-size: clamp(3rem, 1.5rem + 5vw, 6rem);
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+    margin-bottom: 14px;
+  }
+  .tag {
+    color: var(--muted);
+    margin: 0;
+    font-size: var(--step-lead);
+    letter-spacing: -0.02em;
+  }
+  .ph-right {
+    text-align: right;
+  }
+  .price {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .price :global(s) {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .avail {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    margin: 0;
+    max-width: none;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #29a33f;
   }
   .gal-main {
     background: var(--paper-2);
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 2 / 1;
     border-radius: var(--radius);
     overflow: hidden;
   }
@@ -147,23 +209,31 @@ const gallery: [PhotoKey, string][] = isDryad
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: fade 240ms var(--ease-out);
+    animation: fade 320ms var(--ease-out);
+  }
+  .gal img.contain {
+    object-fit: contain;
+    background: #fff;
+    padding: 2% 6%;
+  }
+  .gal-thumbs img.contain {
+    padding: 4%;
   }
   @keyframes fade {
     from {
-      opacity: 0.4;
+      opacity: 0;
     }
   }
   .gal-thumbs {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
   }
   .gal-thumbs button {
+    width: 112px;
     padding: 0;
     border: 0;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     background: var(--paper-2);
     position: relative;
     border-radius: 10px;
@@ -173,7 +243,7 @@ const gallery: [PhotoKey, string][] = isDryad
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.65;
+    opacity: 0.6;
     transition: opacity var(--t-ui) var(--ease-out);
   }
   .gal-thumbs button:hover img,
@@ -187,47 +257,34 @@ const gallery: [PhotoKey, string][] = isDryad
     box-shadow: inset 0 0 0 2px var(--ink);
     border-radius: 10px;
   }
-
-  .kicker {
-    margin-bottom: 10px;
+  .buy-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: clamp(32px, 6vw, 112px);
+    margin-top: clamp(48px, 6vw, 88px);
+    align-items: start;
   }
-  .cfg h1 {
-    font-size: clamp(2.5rem, 1.6rem + 2.6vw, 3.75rem);
-    font-weight: 600;
-    letter-spacing: -0.035em;
-    margin-bottom: 12px;
+  .buy-intro {
+    position: sticky;
+    top: calc(var(--bar-h) + 32px);
   }
-  .tag {
+  .buy-intro h2 {
+    font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+    margin-bottom: 14px;
+  }
+  .trust {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
     color: var(--muted);
-    margin-bottom: 18px;
   }
-  .price {
-    font-size: 1.5rem;
-    margin-bottom: 6px;
-    transition: opacity var(--t-ui) var(--ease-out);
+  .trust li {
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
   }
-  .price :global(s) {
-    font-size: 1rem;
-    color: var(--muted);
-    margin-left: 8px;
+  .cfg {
+    border-top: 1px solid var(--line);
   }
-  .avail {
-    max-width: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--line);
-    margin: 0;
-  }
-  .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--ink);
-  }
-
   .steps {
     list-style: none;
     padding: 0;
@@ -423,16 +480,20 @@ const gallery: [PhotoKey, string][] = isDryad
     }
   }
   @media (max-width: 960px) {
-    .pdp-in {
+    .buy-grid {
       grid-template-columns: 1fr;
     }
-    .gal {
+    .buy-intro {
       position: static;
-      margin-inline: calc(-1 * var(--margin));
     }
-    .gal-thumbs {
-      grid-template-columns: repeat(4, 1fr);
-      padding-inline: var(--margin);
+    .ph-right {
+      text-align: left;
+    }
+    .gal-main {
+      aspect-ratio: 4 / 3;
+    }
+    .gal-thumbs button {
+      width: 72px;
     }
   }
   @media (max-width: 420px) {
@@ -470,7 +531,7 @@ const gallery: [PhotoKey, string][] = isDryad
     const pick: Record<string, string> = {};
     const el = (id: string) => form.querySelector<HTMLElement>(`[data-step="${id}"]`)!;
     const summary = el("summary");
-    const priceEl = form.querySelector<HTMLElement>("[data-price]")!;
+    const priceEl = form.closest("section")!.querySelector<HTMLElement>("[data-price]")!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const skipped = (s: Cfg["steps"][number]) => !!s.skipIf && pick[s.skipIf[0]] === s.skipIf[1];

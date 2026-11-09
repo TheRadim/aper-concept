@@ -5,6 +5,39 @@ import SubNav from "../components/SubNav.astro";
 import Configurator from "../components/Configurator.astro";
 import { bikeBySlug } from "../data/catalog";
 const bike = bikeBySlug("kompace");
+// Geometry with 170 mm fork, from APER's published chart (aper-bikes.com/kompace).
+const kRows: [string, (string | number)[]][] = [
+  ["Head angle", [63.6, 64.2, 63.6, 64.2, 63.6, 64.2]],
+  ["Head tube", [100, 100, 110, 110, 120, 120]],
+  ["BB offset", [-22, -13, -22, -13, -22, -13]],
+  ["Seat angle", [78.1, 78.6, 79.1, 79.6, 79.8, 80.4]],
+  ["Seat tube", [418, 418, 438, 438, 458, 458]],
+  ["Reach", [476, 482, 501, 507, 529, 535]],
+  ["Stack", [612, 608, 621, 616, 630, 625]],
+  ["Wheelbase", [1247, 1242, 1275, 1270, 1306, 1301]],
+  ["Chainstay", [430, 426, 430, 426, 430, 426]],
+  ["Fork offset", [44, 44, 44, 44, 44, 44]],
+];
+const col = (label: string) => kRows.find((r) => r[0] === label)![1];
+const kgeo = Object.fromEntries(
+  ["S1", "S2", "S3"].flatMap((z, zi) => ["Low", "High"].map((f, fi) => [`${z}-${f}`, { reach: col("Reach")[zi * 2 + fi], stack: col("Stack")[zi * 2 + fi], ha: col("Head angle")[zi * 2 + fi], wb: col("Wheelbase")[zi * 2 + fi] }])),
+);
+const frameSpecs: [string, string][] = [
+  ["Intended use", "Enduro"],
+  ["Construction", "CNC-machined from solid 7075-T6, hollowed and bonded"],
+  ["Wheel size", "29 in, up to 2.5 in tyres; flip chip for mullet"],
+  ["Travel", "160 mm rear, 160–170 mm fork"],
+  ["Rear axle", "APER 12×148 Boost"],
+  ["Headset", "IS41/28.6 – IS52/40"],
+  ["Seatpost", "31.6 mm; max insert S1 215, S2 235, S3 265 mm"],
+  ["Shock", "205×60 metric, trunnion, air"],
+  ["Brake mount", "PM 180"],
+  ["Bottom bracket", "68 mm BSA, ISCG 05"],
+  ["Cable routing", "Internal"],
+  ["Bottle mount", "1, down tube"],
+  ["Derailleur hanger", "SRAM UDH"],
+  ["Frame weight", "4,080 g (S1, without shock)"],
+];
 const rows: [string, string][] = [
   ["Use", "Enduro"],
   ["Travel", "170 mm front / 160 mm rear"],
@@ -29,7 +62,7 @@ const colours = [
 
 <Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension." page="kompace">
   <Configurator bike={bike} />
-  <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Figures", "#figures"]]} />
+  <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Geometry", "#figures"], ["Specs", "#specs"]]} />
 
   <section class="section light" id="overview" aria-labelledby="ov-h">
     <div class="wrap ov">
@@ -76,18 +109,141 @@ const colours = [
       </ul>
     </div>
   </section>
-  <section class="section light alt" id="figures" aria-labelledby="fig-h">
-    <div class="wrap ov">
-      <h2 id="fig-h">Key figures</h2>
-      <div class="table-wrap">
-        <table><tbody>{rows.map(([a, b]) => <tr><th scope="row">{a}</th><td>{b}</td></tr>)}</tbody></table>
-        
+  <section class="section light" id="figures" aria-labelledby="fig-h">
+    <div class="wrap">
+      <div class="head-row">
+        <h2 id="fig-h">Size and geometry</h2>
+        <p>Three sizes, two settings. The flip chip switches between a low and a high geometry.</p>
       </div>
+      <div class="kgeo" data-kgeo={JSON.stringify(kgeo)}>
+        <div class="kg-controls">
+          <div class="seg" role="radiogroup" aria-label="Size">
+            {["S1", "S2", "S3"].map((z, i) => <button type="button" role="radio" aria-checked={i === 1 ? "true" : "false"} data-size={z}>{z}</button>)}
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Flip chip setting">
+            {["Low", "High"].map((z, i) => <button type="button" role="radio" aria-checked={i === 0 ? "true" : "false"} data-set={z}>{z}</button>)}
+          </div>
+        </div>
+        <dl class="kg-stats" aria-live="polite">
+          {[["reach", "Reach", "mm"], ["stack", "Stack", "mm"], ["ha", "Head angle", "°"], ["wb", "Wheelbase", "mm"]].map(([k, l, u]) => (
+            <div><dt>{l}</dt><dd><span data-k={k} class="num"></span><small>{u}</small></dd></div>
+          ))}
+        </dl>
+        <p class="small muted kg-note">Not sure between two sizes? Send us your height and inseam and we'll recommend one: <a class="link" href="mailto:info@aper-bikes.com?subject=KOMPace%20sizing">info@aper-bikes.com</a></p>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr">KOMPace geometry with a 170 mm fork, millimetres and degrees</caption>
+            <thead>
+              <tr><th scope="col">With 170 mm fork</th>{["S1", "S2", "S3"].flatMap((z) => [<th scope="col" data-col={`${z}-Low`}>{z} low</th>, <th scope="col" data-col={`${z}-High`}>{z} high</th>])}</tr>
+            </thead>
+            <tbody>
+              {kRows.map(([label, vals]) => (
+                <tr><th scope="row">{label}</th>{vals.map((v, i) => <td data-col={`S${Math.floor(i / 2) + 1}-${i % 2 ? "High" : "Low"}`}>{v}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section light alt" id="specs" aria-labelledby="spec-h">
+    <div class="wrap ov">
+      <div>
+        <h2 id="spec-h">Frame specification</h2>
+        <p class="muted">Front and rear triangles are machined from solid 7075-T6, hollowed and bonded together, then anodised in the colour you choose.</p>
+      </div>
+      <dl class="fspec">{frameSpecs.map(([k, v]) => (<div><dt>{k}</dt><dd>{v}</dd></div>))}</dl>
     </div>
   </section>
 </Layout>
 
 <style>
+  .kg-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .seg {
+    display: inline-flex;
+    background: var(--paper-2);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .seg button {
+    border: 0;
+    background: transparent;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    transition: background-color var(--t-ui) var(--ease-out), box-shadow var(--t-ui) var(--ease-out);
+  }
+  .seg button[aria-checked="true"] {
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  }
+  .kg-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0 0 20px;
+  }
+  .kg-stats div {
+    border-top: 1px solid var(--ink);
+    padding-top: 12px;
+  }
+  .kg-stats dt {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .kg-stats dd {
+    margin: 4px 0 0;
+    font-size: clamp(2rem, 1.4rem + 2vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .kg-stats small {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .kg-stats [data-k] {
+    display: inline-block;
+    transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .kg-stats.swap [data-k] {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .kg-note {
+    margin-bottom: 28px;
+  }
+  .kgeo :global(td.on),
+  .kgeo :global(th.on) {
+    background: var(--paper-2);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .fspec {
+    margin: 0;
+  }
+  .fspec div {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9375rem;
+  }
+  .fspec dt {
+    color: var(--muted);
+  }
+  .fspec dd {
+    margin: 0;
+  }
   .ov {
     display: grid;
     grid-template-columns: 5fr 6fr;
@@ -140,6 +296,9 @@ const colours = [
     font-weight: 600;
   }
   @media (max-width: 860px) {
+    .kg-stats {
+      grid-template-columns: 1fr 1fr;
+    }
     .ov,
     .k-grid,
     .gallery {
@@ -150,3 +309,33 @@ const colours = [
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-kgeo]").forEach((root) => {
+    const data = JSON.parse(root.dataset.kgeo!) as Record<string, Record<string, number>>;
+    const stats = root.querySelector<HTMLElement>(".kg-stats")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let size = "S2", set = "Low", first = true;
+    const paint = () => {
+      const d = data[`${size}-${set}`];
+      root.querySelectorAll<HTMLElement>("[data-k]").forEach((el) => (el.textContent = String(d[el.dataset.k!])));
+      root.querySelectorAll<HTMLElement>("[data-col]").forEach((c) => c.classList.toggle("on", c.dataset.col === `${size}-${set}`));
+    };
+    const update = () => {
+      if (first || reduce) { paint(); first = false; return; }
+      stats.classList.add("swap");
+      setTimeout(() => { paint(); stats.classList.remove("swap"); }, 160);
+    };
+    const bind = (attr: string, setVal: (v: string) => void) => {
+      const btns = [...root.querySelectorAll<HTMLButtonElement>(`[${attr}]`)];
+      btns.forEach((b) => b.addEventListener("click", () => {
+        btns.forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+        setVal(b.getAttribute(attr)!);
+        update();
+      }));
+    };
+    bind("data-size", (v) => (size = v));
+    bind("data-set", (v) => (set = v));
+    update();
+  });
+</script>

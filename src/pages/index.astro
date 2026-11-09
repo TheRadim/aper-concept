@@ -31,7 +31,7 @@ const service = [
       <p class="lead">APER builds bicycles. Two mechanical engineers and a small team design, program, machine and assemble every frame in-house.</p>
       <div class="actions">
         <a class="btn btn-solid" href={`${base}dryad/`}>Discover the DRYAD</a>
-        <a class="btn btn-line" href={`${base}engineering/`}>How we build</a>
+        <a class="btn btn-line" href={`${base}about/`}>How we build</a>
       </div>
     </div>
   </section>
@@ -46,7 +46,7 @@ const service = [
         {bikes.map((bk) => (
           <article class="tile">
             <a class="tile-img" href={`${base}${bk.slug}/`} tabindex="-1" aria-hidden="true">
-              <Photo img={bk.card} alt="" shot={`${bk.name} studio profile`} ratio="4 / 5" pos={bk.cardPos} />
+              <Photo img={bk.card} alt="" shot={`${bk.name} studio profile`} ratio="16 / 10" pos={bk.cardPos} />
             </a>
             <div class="tile-text">
               <h3>{bk.name}</h3>
@@ -67,7 +67,7 @@ const service = [
     <div class="wrap">
       <div class="head-row">
         <h2 id="how-h">How a frame is made</h2>
-        <a class="link" href={`${base}engineering/`}>Read the full process</a>
+        <a class="link more" href={`${base}about/#process`}>See the full process</a>
       </div>
       <Photo img="ribDetail" alt="RibLogic down tube detail on the mill" shot="Machining centre cutting a DRYAD down tube, coolant and chips." ratio="84 / 26" class="how-photo" />
       <ol class="how" data-reveal>
@@ -120,7 +120,7 @@ const service = [
         <p class="lead">APER began with Nikos's thesis at the University of Patras: a rear suspension for downhill bikes.</p>
         <p>Giorgos saw where it could go. The idea became the patented Rising Pivot and APER's first bike, the KOMPace. Christos, Giorgos P. and Kostas have since joined the team.</p>
         <p><em>Aper</em> is Latin for wild boar, after the Erymanthian Boar of Greek myth. The Erymanthos mountains rise above Patras, and they are where the bikes are ridden and tested.</p>
-        <a class="link" href="#contact">Contact the team</a>
+        <a class="link more" href={`${base}about/`}>More about APER</a>
       </div>
     </div>
   </section>

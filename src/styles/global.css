@@ -15,7 +15,8 @@
   --text-light: #1d1d1f;
   --text-light-2: #6e6e73;
   --gold: #d9a92f;
-  --link: #0066cc;
+  --link: #1d1d1f;
+  --focus: #0071e3;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --step-small: 0.8125rem;
@@ -79,7 +80,7 @@ button {
   cursor: pointer;
 }
 :focus-visible {
-  outline: 2px solid var(--link);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 [hidden] {
@@ -242,16 +243,6 @@ html[data-bar-hidden="true"] .subnav {
   gap: 10px;
   text-decoration: none;
   justify-self: start;
-  border-radius: 10px;
-  padding: 4px 8px 4px 2px;
-  margin-left: -2px;
-  transition: background-color var(--t-ui) var(--ease-out);
-}
-.mark:hover {
-  background: var(--paper-2);
-}
-.mark:active {
-  transform: scale(0.98);
 }
 .boar {
   width: 34px;
@@ -647,9 +638,9 @@ html[data-bar-hidden="true"] .subnav {
   gap: 8px;
   min-height: 44px;
   padding: 11px 22px;
-  border-radius: 999px;
-  font-weight: 400;
-  font-size: 1.0625rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 1rem;
   line-height: 1.1;
   text-decoration: none;
   border: 1px solid transparent;
@@ -696,17 +687,25 @@ html[data-bar-hidden="true"] .subnav {
   pointer-events: none;
 }
 .link {
-  color: var(--link);
-  text-decoration: none;
-}
-.dark .link {
-  color: #2997ff;
+  color: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color var(--t-ui) var(--ease-out);
 }
 .link:hover {
-  text-decoration: underline;
+  text-decoration-color: currentColor;
 }
 .link.more::after {
-  content: " ›";
+  content: " →";
+  display: inline-block;
+  margin-left: 2px;
+  transition: transform var(--t-ui) var(--ease-out);
+}
+.link.more:hover::after {
+  transform: translateX(3px);
 }
 .arrow {
   transition: transform var(--t-ui) var(--ease-out);

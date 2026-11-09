@@ -47,6 +47,7 @@ export const WHEEL_R = 356; // 622 bead seat / 2 + 45 mm tyre
 export const VIEW = { x: -840, y: -770, w: 1960, h: 1110 };
 
 export interface Drawing {
+  pieces: { head: string; top: string; seat: string; down: string; shell: string };
   frame: string; // gold members
   stays: string;
   pockets: string; // knock-outs in the down tube
@@ -79,12 +80,14 @@ export function drawBike(g: Geo): Drawing {
     return `M${pt(add(a, n))} L${pt(add(b, n))} L${pt(sub(b, n))} L${pt(sub(a, n))}Z `;
   };
   const headTube = band(add(htTop, mul(htDir, -8)), add(htBot, mul(htDir, 6)), 24);
-  const frame =
-    headTube +
-    band(ttFront, ttRear, 15) +
-    band(add(bb, mul(stDir, -10)), add(seatTop, mul(stDir, 6)), 16) +
-    band(dtTop, bb, 24) +
-    `M${pt(add(bb, [-34, 0]))} a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0Z`;
+  const pieces = {
+    head: headTube,
+    top: band(ttFront, ttRear, 15),
+    seat: band(add(bb, mul(stDir, -10)), add(seatTop, mul(stDir, 6)), 16),
+    down: band(dtTop, bb, 24),
+    shell: `M${pt(add(bb, [-34, 0]))} a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0Z`,
+  };
+  const frame = pieces.head + pieces.top + pieces.seat + pieces.down + pieces.shell;
   const stays = band(bb, rear, 10) + band(ssTop, rear, 8);
 
   // RibLogic pockets along the down tube: a warren-truss row of rounded triangles.
@@ -140,6 +143,7 @@ export function drawBike(g: Geo): Drawing {
     band(bb, add(bb, [Math.cos(rad(-62)) * 170, Math.sin(rad(-62)) * -170]), 9);
 
   return {
+    pieces,
     frame,
     stays,
     pockets,

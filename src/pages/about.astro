@@ -1,0 +1,459 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Photo from "../components/Photo.astro";
+import { drawBike, VIEW, WHEEL_R } from "../lib/bike";
+import { geometry } from "../data/dryad";
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+// The DRYAD in size M, split into layers that appear as the process scrolls.
+const g = geometry.find((x) => x.size === "M")!;
+const d = drawBike(g);
+const rad = (x: number) => (x * Math.PI) / 180;
+const htBot: [number, number] = [g.reach + Math.cos(rad(g.headAngle)) * g.headTube, -g.stack + Math.sin(rad(g.headAngle)) * g.headTube];
+// A zig-zag toolpath running down the length of the down tube.
+const tool = (() => {
+  const [x0, y0] = htBot, [x1, y1] = [0, 0];
+  const len = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / len, uy = (y1 - y0) / len, nx = -uy, ny = ux;
+  let p = "";
+  for (let i = 0; i <= 22; i++) {
+    const t = 40 + (i * (len - 80)) / 22, side = i % 2 ? 30 : -30;
+    const x = x0 + ux * t + nx * side, y = y0 + uy * t + ny * side;
+    p += `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)} `;
+  }
+  return p;
+})();
+const outline = d.frame + d.stays + d.fork;
+
+const steps = [
+  { h: "Design", p: "Every member is modelled around how a loaded bike is used on rough ground: where the load enters, where it travels, where it leaves. Weight is a result, not the target." },
+  { h: "Program", p: "The engineers who draw a part also write its toolpaths. A change to a rib goes from the model to the machine in the same room, often on the same day." },
+  { h: "Machine", p: "Each tube starts as a closed 7075-T6 aluminium profile. The mill cuts integrated ribs, varies the wall thickness and undercuts deep pockets. We call it RibLogic." },
+  { h: "One-piece fork", p: "The fork is cut from a single billet. Steerer, crown and blades are one part, with no bonded crown and no weld." },
+  { h: "Join", p: "Members lock together through machined interfaces, then are structurally bonded and bolted. The seatstays mount on replaceable bushings for controlled comfort." },
+  { h: "Build", p: "Every bike is assembled and checked in Patras to the specification you chose, then ridden before it ships." },
+];
+---
+
+<Layout title="About" description="APER: two mechanical engineers machining bicycles in Patras, Greece. Who we are and how a frame is made." page="about">
+  <section class="a-hero dark" aria-labelledby="ah-h">
+    <Photo img="dryadOnMill" alt="A machined DRYAD frame clamped on the mill table" shot="Workshop at dawn" ratio="auto" pos="50% 62%" class="hero-photo" eager />
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="wrap a-hero-in" data-reveal>
+      <h1 id="ah-h">Engineers first.</h1>
+      <p class="lead">APER is a small workshop in Patras, Greece, where two mechanical engineers and their team design, program, machine and assemble bicycles.</p>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="f-h">
+    <div class="wrap founders">
+      <div class="f-intro" data-reveal>
+        <h2 id="f-h">It started with a thesis.</h2>
+        <p class="lead">Nikos wrote his thesis at the Mechanical and Aeronautics Engineering Department of the University of Patras on a rear suspension for downhill bikes. He kept working on it after graduating.</p>
+      </div>
+      <div class="people" data-reveal>
+        <article>
+          <h3>Nikos</h3>
+          <p class="role small">Co-founder, mechanical engineer</p>
+          <p class="muted">Developed the suspension idea that became the patented Rising Pivot, the heart of the KOMPace.</p>
+        </article>
+        <article>
+          <h3>Giorgos</h3>
+          <p class="role small">Co-founder, mechanical engineer</p>
+          <p class="muted">Saw where the idea could go and pushed to turn it into a complete enduro bike. Leads the product side today.</p>
+        </article>
+        <article>
+          <h3>The team</h3>
+          <p class="role small">Christos, Giorgos P. and Kostas</p>
+          <p class="muted">Joined as the workshop grew, across machining, assembly and support.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="light boar" aria-labelledby="b-h">
+    <div class="wrap boar-in">
+      <Photo img="lightPainting" alt="APER written in light above a KOMPace at night" shot="APER light painting" ratio="16 / 10" />
+      <div data-reveal>
+        <h2 id="b-h">Named for a boar.</h2>
+        <p class="lead"><em>Aper</em> is Latin for wild boar. In Greek myth the Erymanthian Boar lived in the mountains above Patras, the same mountains where our bikes are ridden and tested.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="process dark" id="process" aria-labelledby="p-h">
+    <div class="wrap p-head" data-reveal>
+      <h2 id="p-h">From billet to bike.</h2>
+      <p class="lead muted">Six steps, one building. Scroll to watch a DRYAD take shape.</p>
+    </div>
+    <div class="wrap p-grid">
+      <div class="stage" data-stage data-step="-1" aria-hidden="true">
+        <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} class="build">
+          <path class="l-outline" d={outline} pathLength="1" />
+          <path class="l-tool" d={tool} />
+          <path class="l-down" d={d.pieces.down} />
+          <path class="l-pockets" d={d.pockets} />
+          <path class="l-fork" d={d.fork} />
+          <path class="l-forkp" d={d.forkPockets} />
+          <path class="l-rest" d={d.pieces.head + d.pieces.top + d.pieces.seat + d.pieces.shell + d.stays} />
+          <g class="l-wheels">
+            {[d.wheels.rear, d.wheels.front].map((c) => (
+              <g transform={`translate(${c[0]} ${c[1]})`}><circle r={WHEEL_R - 22} class="tyre" /><circle r={WHEEL_R - 60} class="rim" /></g>
+            ))}
+          </g>
+          <path class="l-parts" d={d.parts} />
+        </svg>
+        <ol class="ticks">{steps.map((s, i) => <li data-tick={i}>{s.h}</li>)}</ol>
+      </div>
+      <ol class="p-steps">
+        {steps.map((s, i) => (
+          <li class="p-step" data-i={i}>
+            <h3>{s.h}</h3>
+            <p>{s.p}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section light" aria-labelledby="h-h">
+    <div class="wrap honest">
+      <div data-reveal>
+        <h2 id="h-h">What machining is not for.</h2>
+        <p class="lead muted">Good engineering includes saying what a method doesn't promise.</p>
+      </div>
+      <dl class="h-list">
+        <div><dt>The lightest frame</dt><dd>The DRYAD puts structural integrity and durability ahead of the lowest weight. A carbon race frame will weigh less.</dd></div>
+        <div><dt>The cheapest method</dt><dd>Machining removes much of the profile it starts from. What it buys is control over where every wall and rib goes.</dd></div>
+        <div><dt>One frame per rider</dt><dd>Rib design shapes how a member flexes, but each size is designed and tested as a whole, not customised per rider.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="light cta" aria-labelledby="c-h">
+    <div class="wrap cta-in">
+      <h2 id="c-h">See it on a bike.</h2>
+      <div class="cta-actions">
+        <a class="btn btn-solid" href={`${base}dryad/`}>DRYAD</a>
+        <a class="btn btn-line" href={`${base}kompace/`}>KOMPace</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .a-hero {
+    position: relative;
+    min-height: min(calc(100svh - var(--bar-h)), 860px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .a-hero :global(.hero-photo) {
+    position: absolute;
+    inset: 0;
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0.1) 60%);
+  }
+  .a-hero-in {
+    position: relative;
+    padding-block: 120px clamp(48px, 7vw, 96px);
+  }
+  .a-hero h1 {
+    margin-bottom: 18px;
+  }
+  .founders {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+  .f-intro h2 {
+    margin-bottom: 20px;
+  }
+  .people {
+    display: grid;
+    gap: 0;
+  }
+  .people article {
+    border-top: 1px solid var(--line);
+    padding: 22px 0;
+  }
+  .people h3 {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  }
+  .role {
+    margin: 4px 0 10px;
+    color: var(--gold);
+    font-weight: 600;
+    filter: brightness(0.75);
+  }
+  .people p:last-child {
+    margin: 0;
+  }
+  .boar {
+    padding-bottom: var(--section);
+  }
+  .boar-in {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(32px, 6vw, 112px);
+    align-items: center;
+  }
+  .boar h2 {
+    margin-bottom: 20px;
+  }
+
+  /* Process: sticky stage, the bike builds up as steps pass */
+  .process {
+    padding-block: var(--section);
+  }
+  .p-head {
+    margin-bottom: clamp(32px, 5vw, 72px);
+  }
+  .p-head h2 {
+    margin-bottom: 14px;
+  }
+  .p-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(32px, 6vw, 96px);
+  }
+  .stage {
+    position: sticky;
+    top: calc(var(--bar-h) + 6vh);
+    height: min(70vh, 640px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .build {
+    width: 118%;
+    margin-left: -9%;
+    height: auto;
+    overflow: visible;
+  }
+  .build path,
+  .build g {
+    transition:
+      opacity 600ms var(--ease-out),
+      stroke-dashoffset 1400ms var(--ease-in-out),
+      fill 600ms var(--ease-out);
+  }
+  .l-outline {
+    fill: none;
+    stroke: #6e6e73;
+    stroke-width: 3;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .l-tool {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2.5;
+    stroke-dasharray: 6 8;
+    opacity: 0;
+  }
+  .l-down,
+  .l-rest {
+    fill: var(--gold);
+    opacity: 0;
+  }
+  .l-pockets {
+    fill: #000;
+    opacity: 0;
+  }
+  .l-fork {
+    fill: #2a2a2d;
+    opacity: 0;
+  }
+  .l-forkp {
+    fill: #6e6e73;
+    opacity: 0;
+  }
+  .l-wheels,
+  .l-parts {
+    opacity: 0;
+  }
+  .l-wheels .tyre {
+    fill: none;
+    stroke: #2a2a2d;
+    stroke-width: 44;
+  }
+  .l-wheels .rim {
+    fill: none;
+    stroke: #48484c;
+    stroke-width: 12;
+  }
+  .l-parts {
+    fill: #3a3a3d;
+  }
+  .stage:is([data-step="0"], [data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"]) .l-outline {
+    stroke-dashoffset: 0;
+  }
+  .stage[data-step="1"] .l-tool {
+    opacity: 1;
+    animation: cut 1.6s linear infinite;
+  }
+  @keyframes cut {
+    to {
+      stroke-dashoffset: -28;
+    }
+  }
+  .stage:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"]) :is(.l-down, .l-pockets) {
+    opacity: 1;
+  }
+  .stage:is([data-step="3"], [data-step="4"], [data-step="5"]) :is(.l-fork, .l-forkp) {
+    opacity: 1;
+  }
+  .stage:is([data-step="4"], [data-step="5"]) .l-rest {
+    opacity: 1;
+  }
+  .stage[data-step="5"] :is(.l-wheels, .l-parts) {
+    opacity: 1;
+  }
+  .stage[data-step="5"] .l-outline {
+    opacity: 0;
+  }
+  .ticks {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    display: flex;
+    gap: 6px;
+  }
+  .ticks li {
+    flex: 1;
+    font-size: 0.75rem;
+    color: var(--text-dark-2);
+    padding-top: 10px;
+    border-top: 2px solid #3a3a3d;
+    transition: color 300ms var(--ease-out), border-color 300ms var(--ease-out);
+  }
+  .ticks li.on {
+    color: var(--text-dark);
+    border-color: var(--gold);
+  }
+  .p-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .p-step {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.35;
+    transition: opacity 400ms var(--ease-out);
+  }
+  .p-step.on {
+    opacity: 1;
+  }
+  .p-step:last-child {
+    min-height: 60vh;
+  }
+  .p-step h3 {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+    margin-bottom: 14px;
+  }
+  .p-step p {
+    color: var(--text-dark-2);
+    font-size: var(--step-lead);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .honest {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: clamp(32px, 6vw, 112px);
+  }
+  .honest h2 {
+    margin-bottom: 16px;
+  }
+  .h-list {
+    margin: 0;
+  }
+  .h-list div {
+    border-top: 1px solid var(--line);
+    padding: 20px 0;
+  }
+  .h-list dt {
+    font-weight: 600;
+    font-size: 1.1875rem;
+    margin-bottom: 6px;
+  }
+  .h-list dd {
+    margin: 0;
+    color: var(--muted);
+  }
+  .cta {
+    padding-block: 0 var(--section);
+  }
+  .cta-in {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 48px;
+  }
+  .cta-actions {
+    display: flex;
+    gap: 10px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .build path,
+    .build g {
+      transition: none;
+    }
+    .stage[data-step="1"] .l-tool {
+      animation: none;
+    }
+  }
+  @media (max-width: 860px) {
+    .founders,
+    .boar-in,
+    .honest {
+      grid-template-columns: 1fr;
+    }
+    .p-grid {
+      grid-template-columns: 1fr;
+    }
+    .stage {
+      top: var(--bar-h);
+      height: auto;
+      padding: 16px 0 12px;
+      background: #000;
+      z-index: 2;
+    }
+    .ticks li {
+      font-size: 0;
+    }
+    .p-step {
+      min-height: 55vh;
+    }
+  }
+</style>
+
+<script>
+  // The step closest to the middle of the viewport drives the stage.
+  const stage = document.querySelector<HTMLElement>("[data-stage]");
+  const stepsEl = [...document.querySelectorAll<HTMLElement>(".p-step")];
+  const ticks = [...document.querySelectorAll<HTMLElement>("[data-tick]")];
+  if (stage) {
+    const set = (i: number) => {
+      stage.dataset.step = String(i);
+      stepsEl.forEach((s, j) => s.classList.toggle("on", j === i));
+      ticks.forEach((t, j) => t.classList.toggle("on", j <= i));
+    };
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => e.isIntersecting && set(Number((e.target as HTMLElement).dataset.i))),
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    stepsEl.forEach((s) => io.observe(s));
+  }
+</script>
