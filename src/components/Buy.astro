@@ -1,0 +1,278 @@
+---
+// Configure and buy: gallery + a compact panel. The build is chosen from one menu, not a list.
+import { photos, type PhotoKey } from "../data/media";
+import { deposit, type Bike } from "../data/catalog";
+import { eur, facts } from "../data/dryad";
+interface Props { bike: Bike }
+const { bike } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const isDryad = bike.slug === "dryad";
+const def = isDryad ? bike.builds[1] : bike.builds[0];
+const gallery: [PhotoKey, string][] = isDryad
+  ? [["dryadWorkshop", "50% 70%"], ["dryadOnMill", "50% 60%"], ["dryadWorkshop", "50% 28%"], ["ribDetail", "50% 50%"]]
+  : [["kompaceStudio", "50% 55%"], ["kompaceBespoked", "50% 55%"], ["kompaceForest", "50% 60%"], ["kompaceDrivetrain", "50% 50%"]];
+const data = bike.builds.map((b) => ({ id: b.id, price: b.price, was: b.was ?? null, summary: b.summary, specs: (b.specs ?? []).slice(0, 3), shop: b.shop }));
+const mid = Math.floor(def.sizes.length / 2);
+---
+
+<section class="buy-sec light" id="buy" aria-labelledby="buy-h">
+  <div class="wrap buy-in">
+    <div class="gal" data-gallery>
+      <div class="gal-main">
+        {gallery.map(([k, pos], i) => (
+          <img src={photos[k].src} width={photos[k].width} height={photos[k].height} alt={`${bike.name}, image ${i + 1}`} style={`object-position:${pos}`} data-slide={i} hidden={i !== 0} loading="lazy" />
+        ))}
+      </div>
+      <div class="gal-thumbs" role="group" aria-label="Choose image">
+        {gallery.map(([k, pos], i) => (
+          <button type="button" data-thumb={i} aria-pressed={i === 0 ? "true" : "false"} aria-label={`Image ${i + 1}`}>
+            <img src={photos[k].src} alt="" style={`object-position:${pos}`} loading="lazy" />
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <form class="panel" data-buy={JSON.stringify({ builds: data, deposit, isDryad })} onsubmit="return false">
+      <h2 id="buy-h">{bike.name}</h2>
+      <p class="pprice num"><span data-price>{eur(def.price)}</span> <s data-was hidden={!def.was}>{def.was ? eur(def.was) : ""}</s></p>
+      <p class="small muted">{isDryad ? `Pre-order price, locked with the deposit. Delivery from ${facts.delivery}.` : "In production. Ships from Patras."}</p>
+
+      <label class="field">
+        <span>Build</span>
+        <select name="build" data-build>
+          {bike.builds.map((b) => <option value={b.id} selected={b.id === def.id}>{b.name.replace(bike.name + " ", "")} · {eur(b.price)}</option>)}
+        </select>
+      </label>
+      <ul class="spec3 small" data-specs>
+        {(def.specs ?? []).slice(0, 3).map(([k, v]) => <li><span class="muted">{k}</span> {v}</li>)}
+      </ul>
+
+      <fieldset class="sizes">
+        <legend><span>Size</span>{isDryad && <a class="link small" href="#size">What's my size?</a>}</legend>
+        <div class="size-row">
+          {def.sizes.map((s, i) => (<label class="size"><input type="radio" name="size" value={s} checked={i === mid} /><span>{s}</span></label>))}
+        </div>
+      </fieldset>
+      <p class="small colour"><strong>Colour</strong> {isDryad ? "Gold, as shown" : "Black · coloured anodising +€300"}{isDryad && <span class="verify" title="Finish options to be confirmed" />}</p>
+
+      <a class="btn btn-solid cta" data-go href={isDryad ? `${def.shop}?build=${def.id}` : def.shop}>{isDryad ? `Reserve with ${eur(deposit)} deposit` : "Buy on aper-bikes.com"}</a>
+      {isDryad && <p class="small muted" data-split>{eur(deposit)} today, {eur(def.price - deposit)} on completion.</p>}
+      <p class="small muted trust">5-year frame warranty · Crash replacement · Built to order in Patras</p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .buy-sec {
+    padding-block: clamp(56px, 7vw, 104px);
+    border-top: 1px solid var(--line-light);
+  }
+  .buy-in {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+  }
+  .gal-main {
+    background: var(--paper-2);
+    aspect-ratio: 4 / 3;
+  }
+  .gal-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: fade 240ms var(--ease-out);
+  }
+  @keyframes fade {
+    from {
+      opacity: 0.4;
+    }
+  }
+  .gal-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .gal-thumbs button {
+    padding: 0;
+    border: 0;
+    aspect-ratio: 4 / 3;
+    background: var(--paper-2);
+    position: relative;
+  }
+  .gal-thumbs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.65;
+    transition: opacity var(--t-ui) var(--ease-out);
+  }
+  .gal-thumbs button:hover img,
+  .gal-thumbs button[aria-pressed="true"] img {
+    opacity: 1;
+  }
+  .gal-thumbs button[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .panel {
+    position: sticky;
+    top: 150px;
+  }
+  .panel h2 {
+    font-size: clamp(1.75rem, 1.3rem + 1.2vw, 2.25rem);
+    margin-bottom: 8px;
+  }
+  .pprice {
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .pprice s {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 24px 0 10px;
+    font-weight: 600;
+  }
+  .field select {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 48px;
+    padding: 0 40px 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23141516' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .field select:hover {
+    border-color: var(--ink);
+  }
+  .spec3 {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 22px;
+  }
+  .spec3 :global(li) {
+    padding: 3px 0;
+  }
+  .spec3 :global(.muted) {
+    display: inline-block;
+    min-width: 84px;
+  }
+  .sizes {
+    border: 0;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+  .sizes legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .size-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .size {
+    position: relative;
+  }
+  .size input {
+    position: absolute;
+    opacity: 0;
+  }
+  .size span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color var(--t-ui) var(--ease-out);
+  }
+  .size span:hover {
+    border-color: var(--ink);
+  }
+  .size input:checked + span {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .size input:focus-visible + span {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .colour {
+    margin: 0 0 20px;
+  }
+  .cta {
+    width: 100%;
+    min-height: 52px;
+    margin-bottom: 8px;
+  }
+  .trust {
+    margin-top: 16px;
+  }
+  @media (max-width: 860px) {
+    .buy-in {
+      grid-template-columns: 1fr;
+    }
+    .gal {
+      margin-inline: calc(-1 * var(--margin));
+    }
+    .gal-thumbs {
+      padding-inline: var(--margin);
+    }
+    .panel {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  import { eur } from "../data/dryad";
+  document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((g) => {
+    const slides = [...g.querySelectorAll<HTMLImageElement>("[data-slide]")];
+    const thumbs = [...g.querySelectorAll<HTMLButtonElement>("[data-thumb]")];
+    thumbs.forEach((t, i) =>
+      t.addEventListener("click", () => {
+        slides.forEach((s, j) => (s.hidden = j !== i));
+        thumbs.forEach((x, j) => x.setAttribute("aria-pressed", String(j === i)));
+      }),
+    );
+  });
+  document.querySelectorAll<HTMLFormElement>("[data-buy]").forEach((f) => {
+    const cfg = JSON.parse(f.dataset.buy!) as { builds: { id: string; price: number; was: number | null; specs: [string, string][]; shop: string }[]; deposit: number; isDryad: boolean };
+    const sel = f.querySelector<HTMLSelectElement>("[data-build]")!;
+    sel.addEventListener("change", () => {
+      const b = cfg.builds.find((x) => x.id === sel.value)!;
+      f.querySelector("[data-price]")!.textContent = eur(b.price);
+      const was = f.querySelector<HTMLElement>("[data-was]")!;
+      was.hidden = !b.was;
+      was.textContent = b.was ? eur(b.was) : "";
+      f.querySelector("[data-specs]")!.innerHTML = b.specs.map(([k, v]) => `<li><span class="muted">${k}</span> ${v}</li>`).join("");
+      const go = f.querySelector<HTMLAnchorElement>("[data-go]")!;
+      go.href = cfg.isDryad ? `${b.shop}?build=${b.id}` : b.shop;
+      const split = f.querySelector("[data-split]");
+      if (split) split.textContent = `${eur(cfg.deposit)} today, ${eur(b.price - cfg.deposit)} on completion.`;
+    });
+  });
+</script>

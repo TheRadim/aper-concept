@@ -1,5 +1,6 @@
 /* APER concept, serious shop version. Tokens first. */
 :root {
+  --bar-h: 72px;
   --black: #0f1011;
   --ink: #141516;
   --ink-2: #1d1f21;
@@ -41,7 +42,7 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 80px;
+  scroll-padding-top: 136px;
 }
 body {
   margin: 0;
@@ -208,6 +209,10 @@ h3 {
 .bar[data-hidden="true"] {
   transform: translateY(-100%);
 }
+/* When the header slides away, the bike sub-navigation slides up with it, so no gap opens. */
+html[data-bar-hidden="true"] .subnav {
+  transform: translateY(calc(-1 * var(--bar-h)));
+}
 .bar-in {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -258,8 +263,9 @@ h3 {
 /* Sub navigation for a bike (sticky under the bar) */
 .subnav {
   position: sticky;
-  top: 72px;
+  top: var(--bar-h);
   z-index: 20;
+  transition: transform var(--t-ui) var(--ease-out);
   background: #fff;
   border-bottom: 1px solid var(--line-light);
 }
@@ -672,8 +678,8 @@ th.on {
   .concept nav {
     display: none;
   }
-  .subnav {
-    top: 60px;
+  :root {
+    --bar-h: 60px;
   }
   .subnav strong {
     display: none;

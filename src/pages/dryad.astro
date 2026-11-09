@@ -4,7 +4,7 @@ import Bike from "../components/Bike.astro";
 import Photo from "../components/Photo.astro";
 import BikeHero from "../components/BikeHero.astro";
 import SubNav from "../components/SubNav.astro";
-import BuildGrid from "../components/BuildGrid.astro";
+import Buy from "../components/Buy.astro";
 import { bikeBySlug } from "../data/catalog";
 import { pocket } from "../lib/bike";
 import { builds, geometry, geoRows, eur, deposit, facts } from "../data/dryad";
@@ -40,7 +40,7 @@ const rib = (i: number) => {
 
 <Layout title="DRYAD, machined gravel bike" description="The APER DRYAD: gravel and bikepacking bike machined from 7075-T6 aluminium in Patras. Concept page." page="dryad">
   <BikeHero bike={bike} />
-  <SubNav name="DRYAD" links={[["Overview", "#overview"], ["Builds", "#builds"], ["Features", "#features"], ["Geometry", "#size"], ["Compare", "#compare"], ["FAQ", "#faq"]]} />
+  <SubNav name="DRYAD" links={[["Overview", "#overview"], ["Buy", "#buy"], ["Features", "#features"], ["Geometry", "#size"], ["Compare", "#compare"], ["FAQ", "#faq"]]} />
 
   <section class="section light" id="overview" aria-labelledby="ov-h">
     <div class="wrap ov">
@@ -53,7 +53,7 @@ const rib = (i: number) => {
     </div>
   </section>
 
-  <BuildGrid bike={bike} />
+  <Buy bike={bike} />
 
   <section class="section light" id="features" aria-labelledby="e-h">
     <div class="wrap">

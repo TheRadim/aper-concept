@@ -33,8 +33,11 @@ addEventListener(
     requestAnimationFrame(() => {
       const y = scrollY;
       const open = nav?.getAttribute("data-open") === "true";
-      if (bar) bar.dataset.hidden = String(!open && y > 400 && y > lastY + 4);
-      if (y < lastY - 4 || y < 400) bar && (bar.dataset.hidden = "false");
+      if (bar) {
+        if (!open && y > 400 && y > lastY + 4) bar.dataset.hidden = "true";
+        else if (y < lastY - 4 || y < 400) bar.dataset.hidden = "false";
+        document.documentElement.dataset.barHidden = bar.dataset.hidden ?? "false";
+      }
       lastY = y;
       ticking = false;
     });

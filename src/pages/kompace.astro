@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Photo from "../components/Photo.astro";
 import BikeHero from "../components/BikeHero.astro";
 import SubNav from "../components/SubNav.astro";
-import BuildGrid from "../components/BuildGrid.astro";
+import Buy from "../components/Buy.astro";
 import { bikeBySlug } from "../data/catalog";
 const bike = bikeBySlug("kompace");
 const rows: [string, string][] = [
@@ -28,7 +28,7 @@ const colours = [
 
 <Layout title="KOMPace" description="APER KOMPace enduro bike with Rising Pivot suspension. Concept outline." page="kompace">
   <BikeHero bike={bike} />
-  <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Builds", "#builds"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Figures", "#figures"]]} />
+  <SubNav name="KOMPace" links={[["Overview", "#overview"], ["Buy", "#buy"], ["Rising Pivot", "#rising-pivot"], ["Colours", "#colours"], ["Figures", "#figures"]]} />
 
   <section class="section light" id="overview" aria-labelledby="ov-h">
     <div class="wrap ov">
@@ -41,7 +41,7 @@ const colours = [
     </div>
   </section>
 
-  <BuildGrid bike={bike} />
+  <Buy bike={bike} />
 
   <section class="section dark" id="rising-pivot" aria-labelledby="rp-h">
     <div class="wrap">

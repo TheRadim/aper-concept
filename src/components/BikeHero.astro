@@ -14,7 +14,7 @@ const { bike } = Astro.props;
       {bike.chips.map(([k, v]) => (<div><dt>{k}</dt><dd>{v}</dd></div>))}
     </dl>
     <div class="bh-actions">
-      <a class="btn btn-solid" href="#builds">Shop builds from {eur(bike.from)}</a>
+      <a class="btn btn-solid" href="#buy">Configure from {eur(bike.from)}</a>
       <a class="btn btn-line" href="#overview">Overview</a>
     </div>
   </div>
